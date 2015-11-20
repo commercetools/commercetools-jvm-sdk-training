@@ -34,6 +34,7 @@
     * limit/offset
 * UpdateCommands
 * DeleteCommands
+* deal with Nullable/Optional
 
 ### parallel calls
 * async + map/flatMap
