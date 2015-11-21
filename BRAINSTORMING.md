@@ -18,6 +18,9 @@
     * async stuff/blocking client
         * requires Java 8 CompletionStage
     * SphereRequest
+        * show manually implementation with http request intent
+        * get as byte[]
+        * get as JSON
     * initialize client
     * test examples with blocking client
     * references and reference expansion
