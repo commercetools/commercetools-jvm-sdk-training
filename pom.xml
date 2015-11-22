@@ -34,12 +34,12 @@
         <dependency>
             <groupId>io.sphere.sdk.jvm</groupId>
             <artifactId>sphere-models</artifactId>
-            <version>1.0.0-M20</version>
+            <version>1.0.0-M21-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.sphere.sdk.jvm</groupId>
             <artifactId>sphere-java-client</artifactId>
-            <version>1.0.0-M20</version>
+            <version>1.0.0-M21-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

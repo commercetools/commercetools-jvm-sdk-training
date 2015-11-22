@@ -3,6 +3,7 @@ Java project to play with the Commercetools JVM SDK
 
 ## Units
 
+1. [SphereClient and SphereRequest](src/test/java/architecture/README.md)
 1. CRUD
     1. [create](src/test/java/crud/lecture1_create/README.md)
     1. [get by identifier](src/test/java/crud/lecture2_get/README.md)
