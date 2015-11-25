@@ -1,5 +1,6 @@
 package intern;
 
+import io.sphere.sdk.categories.Category;
 import io.sphere.sdk.categories.CategoryDraft;
 import io.sphere.sdk.categories.CategoryDraftBuilder;
 import io.sphere.sdk.categories.commands.CategoryCreateCommand;
@@ -12,6 +13,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -29,20 +31,26 @@ public abstract class BaseTest {
 
     @BeforeClass
     public static void fixtures() throws IOException {
-        for(int i = 0; i < 100; i++) {
-            final String group = "A";
-            final LocalizedString name = LocalizedString.of(Locale.ENGLISH, String.format("Category " + group + "%3d", i));
-            final LocalizedString slug = name.slugified();
-            final CategoryDraft categoryDraft = CategoryDraftBuilder.of(name, slug)
-                    .externalId(group + i)
-                    .build();
-            ct().complete(CategoryCreateCommand.of(categoryDraft));
+        if (getSomeCategories().isEmpty()) {
+            for(int i = 0; i < 100; i++) {
+                final String group = "A";
+                final LocalizedString name = LocalizedString.of(Locale.ENGLISH, String.format("Category " + group + "%3d", i));
+                final LocalizedString slug = name.slugified();
+                final CategoryDraft categoryDraft = CategoryDraftBuilder.of(name, slug)
+                        .externalId(group + i)
+                        .build();
+                ct().complete(CategoryCreateCommand.of(categoryDraft));
+            }
         }
     }
 
     protected static String categoryId() {
+        return getSomeCategories().get(0).getExternalId();
+    }
+
+    private static List<Category> getSomeCategories() {
         final CategoryQuery request = CategoryQuery.of().withPredicates(m -> m.externalId().is("A1"));
-        return ct().complete(request).getResults().get(0).getExternalId();
+        return ct().complete(request).getResults();
     }
 
     @AfterClass
@@ -53,5 +61,9 @@ public abstract class BaseTest {
 
     protected static Client ct() {
         return client;
+    }
+
+    protected static <T> T TODO() {
+        throw new UnsupportedOperationException();
     }
 }

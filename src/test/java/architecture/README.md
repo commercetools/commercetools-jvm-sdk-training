@@ -2,7 +2,7 @@
 
 * understand tasks of client: refetch token, execute one request
 * create SphereRequest by hand
-* HttpRequestIntends are project independent
+* HttpRequestIntents are project independent
 * understand benefits of typed SphereRequests
    * get compiler errors on API change
    * send correct types
