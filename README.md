@@ -11,3 +11,12 @@ Java project to play with the Commercetools JVM SDK
     1. [update](src/test/java/crud/lecture4_update/README.md)
     1. [delete](src/test/java/crud/lecture5_delete/README.md)
 1. [Common Types](src/test/java/commontypes/README.md)
+
+## Links
+
+* Developer documentation HTTP API: http://dev.commercetools.com/
+* JVM SDK: https://github.com/sphereio/sphere-jvm-sdk
+* Hands on: https://github.com/sphereio/sphere-jvm-sdk-hands-on
+* Merchant Center: https://admin.sphere.io/
+* Playground/impex: https://impex.sphere.io/playground
+* Spring MVC example: https://github.com/sphereio/spring-mvc-example
