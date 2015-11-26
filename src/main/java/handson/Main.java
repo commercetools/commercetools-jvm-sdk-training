@@ -3,8 +3,10 @@ package handson;
 import com.neovisionaries.i18n.CountryCode;
 import io.sphere.sdk.carts.Cart;
 import io.sphere.sdk.carts.CartDraft;
+import io.sphere.sdk.carts.CustomLineItemDraft;
 import io.sphere.sdk.carts.commands.CartCreateCommand;
 import io.sphere.sdk.carts.commands.CartUpdateCommand;
+import io.sphere.sdk.carts.commands.updateactions.AddCustomLineItem;
 import io.sphere.sdk.carts.commands.updateactions.AddLineItem;
 import io.sphere.sdk.carts.commands.updateactions.ChangeLineItemQuantity;
 import io.sphere.sdk.carts.commands.updateactions.SetShippingAddress;
@@ -32,6 +34,14 @@ import java.util.Properties;
 import static java.util.Arrays.asList;
 
 public class Main {
+
+    private static Cart addCustomLineItem(final SphereClient client, final Cart cart) {
+        final CustomLineItemDraft of = null;
+        return execute(client, CartUpdateCommand.of(cart, AddCustomLineItem.of(of)));
+    }
+
+
+
     private static void doSomething(final SphereClient client) {
         final Cart cart = createCart(client);
         final String sku = "book-sku";
@@ -50,7 +60,7 @@ public class Main {
 
                 final Cart updatedCart = addToCart(client, cart, productId, productVariant, quantity);
 
-                final Cart cartWithMore = changeLineItemQuantity(client, updatedCart);
+                final Cart cartWithMore = addCustomLineItem(client, updatedCart);
 
                 final String sapOrderNumber = "012345";
 
