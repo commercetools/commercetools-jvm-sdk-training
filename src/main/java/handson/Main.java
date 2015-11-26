@@ -17,6 +17,7 @@ import io.sphere.sdk.client.SphereRequest;
 import io.sphere.sdk.commands.UpdateAction;
 import io.sphere.sdk.models.Address;
 import io.sphere.sdk.models.DefaultCurrencyUnits;
+import io.sphere.sdk.models.LocalizedString;
 import io.sphere.sdk.orders.Order;
 import io.sphere.sdk.orders.OrderFromCartDraft;
 import io.sphere.sdk.orders.PaymentState;
@@ -25,19 +26,25 @@ import io.sphere.sdk.products.ProductProjection;
 import io.sphere.sdk.products.ProductVariant;
 import io.sphere.sdk.products.queries.ProductProjectionQuery;
 import io.sphere.sdk.queries.PagedQueryResult;
+import io.sphere.sdk.utils.MoneyImpl;
 
+import javax.money.MonetaryAmount;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
 
+import static io.sphere.sdk.models.DefaultCurrencyUnits.EUR;
 import static java.util.Arrays.asList;
 
 public class Main {
 
     private static Cart addCustomLineItem(final SphereClient client, final Cart cart) {
-        final CustomLineItemDraft of = null;
-        return execute(client, CartUpdateCommand.of(cart, AddCustomLineItem.of(of)));
+        final LocalizedString name = LocalizedString.of(Locale.ENGLISH, "name");
+        final MonetaryAmount monetaryAmount = MoneyImpl.ofCents(1234, EUR);
+        final CustomLineItemDraft customLineItemDraft = CustomLineItemDraft.of(name, "product-xyz", monetaryAmount, null, 1);
+        return execute(client, CartUpdateCommand.of(cart, AddCustomLineItem.of(customLineItemDraft)));
     }
 
 
@@ -72,7 +79,7 @@ public class Main {
     }
 
     private static Cart createCart(final SphereClient client) {
-        final CartDraft cartDraft = CartDraft.of(DefaultCurrencyUnits.EUR)
+        final CartDraft cartDraft = CartDraft.of(EUR)
                 .withCountry(CountryCode.DE);
         final CartCreateCommand cartCreateCommand = CartCreateCommand.of(cartDraft);
         return execute(client, cartCreateCommand);
