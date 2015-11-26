@@ -27,10 +27,6 @@ public abstract class BaseTest {
         final SphereClientConfig clientConfig = SphereClientConfig.of(prop.getProperty("projectKey"), prop.getProperty("clientId"), prop.getProperty("clientSecret"));
         final SphereClient sphereClient = SphereClientFactory.of().createClient(clientConfig);
         client = new ClientImpl(sphereClient);
-    }
-
-    @BeforeClass
-    public static void fixtures() throws IOException {
         if (getSomeCategories().isEmpty()) {
             for(int i = 0; i < 100; i++) {
                 final String group = "A";
@@ -54,7 +50,7 @@ public abstract class BaseTest {
     }
 
     @AfterClass
-    public void closeClient() throws Exception {
+    public static void closeClient() throws Exception {
         client.close();
         client = null;
     }
