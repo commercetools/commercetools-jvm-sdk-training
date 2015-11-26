@@ -40,7 +40,7 @@ public class GetTest extends BaseTest {
 
     @BeforeClass
     @AfterClass
-    public void cleanup() {
+    public static void cleanup() {
         final ProductType productType = ct().complete(ProductTypeByKeyGet.of(PRODUCT_TYPE_KEY));
         if (productType != null) {
             ct().complete(ProductQuery.of().byProductType(productType)).getResults()
@@ -50,7 +50,7 @@ public class GetTest extends BaseTest {
     }
 
     @BeforeClass
-    public void setup() {
+    public static void setup() {
         final ProductType productType = ct().complete(ProductTypeCreateCommand.of(ProductTypeDraft.of(PRODUCT_TYPE_KEY, "tshirt", "a t shaped cloth", Collections.emptyList())));
         final LocalizedString name = LocalizedString.of(Locale.ENGLISH, "foo");
         final ProductVariantDraft productVariantDraft = ProductVariantDraftBuilder.of().build();
