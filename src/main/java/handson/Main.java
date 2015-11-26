@@ -7,13 +7,17 @@ import io.sphere.sdk.carts.commands.CartCreateCommand;
 import io.sphere.sdk.carts.commands.CartUpdateCommand;
 import io.sphere.sdk.carts.commands.updateactions.AddLineItem;
 import io.sphere.sdk.carts.commands.updateactions.ChangeLineItemQuantity;
-import io.sphere.sdk.carts.queries.CartByIdGet;
+import io.sphere.sdk.carts.commands.updateactions.SetShippingAddress;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.client.SphereClientConfig;
 import io.sphere.sdk.client.SphereClientFactory;
 import io.sphere.sdk.client.SphereRequest;
+import io.sphere.sdk.commands.UpdateAction;
+import io.sphere.sdk.models.Address;
 import io.sphere.sdk.models.DefaultCurrencyUnits;
-import io.sphere.sdk.models.Versioned;
+import io.sphere.sdk.orders.Order;
+import io.sphere.sdk.orders.OrderFromCartDraft;
+import io.sphere.sdk.orders.PaymentState;
 import io.sphere.sdk.orders.commands.OrderFromCartCreateCommand;
 import io.sphere.sdk.products.ProductProjection;
 import io.sphere.sdk.products.ProductVariant;
@@ -21,8 +25,11 @@ import io.sphere.sdk.products.queries.ProductProjectionQuery;
 import io.sphere.sdk.queries.PagedQueryResult;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+
+import static java.util.Arrays.asList;
 
 public class Main {
     private static void doSomething(final SphereClient client) {
@@ -47,6 +54,9 @@ public class Main {
 
                 final String sapOrderNumber = "012345";
 
+
+                final OrderFromCartDraft draft = OrderFromCartDraft.of(cartWithMore, sapOrderNumber, PaymentState.PENDING);
+                final Order order = execute(client, OrderFromCartCreateCommand.of(draft));
             }
         }
     }
@@ -65,7 +75,9 @@ public class Main {
 
     private static Cart addToCart(final SphereClient client, final Cart cart, final String productId, final ProductVariant productVariant, final int quantity) {
         final AddLineItem addLineItem = AddLineItem.of(productId, productVariant.getId(), quantity);
-        return execute(client, CartUpdateCommand.of(cart, addLineItem));
+        final SetShippingAddress setShippingAddress = SetShippingAddress.of(Address.of(CountryCode.DE));
+        final List<UpdateAction<Cart>> updateActions = asList(addLineItem, setShippingAddress);
+        return execute(client, CartUpdateCommand.of(cart, updateActions));
     }
 
     private static <T> T execute(final SphereClient client, final SphereRequest<T> sphereRequest) {
