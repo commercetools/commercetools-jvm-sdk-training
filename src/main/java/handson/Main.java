@@ -1,116 +1,43 @@
 package handson;
 
-import com.neovisionaries.i18n.CountryCode;
 import io.sphere.sdk.carts.Cart;
 import io.sphere.sdk.carts.CartDraft;
 import io.sphere.sdk.carts.CustomLineItemDraft;
+import io.sphere.sdk.carts.LineItem;
 import io.sphere.sdk.carts.commands.CartCreateCommand;
 import io.sphere.sdk.carts.commands.CartUpdateCommand;
 import io.sphere.sdk.carts.commands.updateactions.AddCustomLineItem;
 import io.sphere.sdk.carts.commands.updateactions.AddLineItem;
-import io.sphere.sdk.carts.commands.updateactions.ChangeLineItemQuantity;
-import io.sphere.sdk.carts.commands.updateactions.SetShippingAddress;
+import io.sphere.sdk.carts.commands.updateactions.RemoveLineItem;
+import io.sphere.sdk.carts.commands.updateactions.SetCustomLineItemCustomType;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.client.SphereClientConfig;
 import io.sphere.sdk.client.SphereClientFactory;
 import io.sphere.sdk.client.SphereRequest;
 import io.sphere.sdk.commands.UpdateAction;
-import io.sphere.sdk.models.Address;
+import io.sphere.sdk.models.DefaultCurrencyUnits;
 import io.sphere.sdk.models.LocalizedString;
-import io.sphere.sdk.models.Reference;
-import io.sphere.sdk.orders.Order;
-import io.sphere.sdk.orders.OrderFromCartDraft;
-import io.sphere.sdk.orders.PaymentState;
-import io.sphere.sdk.orders.commands.OrderFromCartCreateCommand;
 import io.sphere.sdk.products.ProductProjection;
-import io.sphere.sdk.products.ProductVariant;
 import io.sphere.sdk.products.queries.ProductProjectionQuery;
 import io.sphere.sdk.queries.PagedQueryResult;
-import io.sphere.sdk.taxcategories.TaxCategory;
-import io.sphere.sdk.utils.MoneyImpl;
-import org.apache.commons.lang3.RandomStringUtils;
+import io.sphere.sdk.types.*;
+import io.sphere.sdk.types.commands.TypeCreateCommand;
+import io.sphere.sdk.types.queries.TypeQuery;
+import org.javamoney.moneta.Money;
 
-import javax.money.MonetaryAmount;
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
+import java.math.BigDecimal;
+import java.util.*;
 
-import static io.sphere.sdk.models.DefaultCurrencyUnits.EUR;
+import static io.sphere.sdk.models.TextInputHint.*;
+import static io.sphere.sdk.utils.SetUtils.asSet;
 import static java.util.Arrays.asList;
+import static java.util.Locale.ENGLISH;
 
 public class Main {
 
-    private static Cart addCustomLineItem(final SphereClient client, final Cart cart, final ProductProjection productProjection, final ProductVariant productVariant) {
-        final LocalizedString name = productProjection.getName();
-        final MonetaryAmount monetaryAmount = MoneyImpl.ofCents(1234, EUR);//this can come from SAP
-        final String slug = productVariant.getSku();
-        final Reference<TaxCategory> taxCategory = productProjection.getTaxCategory();
-        final int quantity = 1;
-
-        //TODO
-        //values.put("productId", productProjection.getId());
-        //values.put("productSlug", productProjection.getSlug());
-        //values.put("productSku", productVariant.getSku());
-
-        final CustomLineItemDraft customLineItemDraft = CustomLineItemDraft.of(name, slug, monetaryAmount, taxCategory, quantity);
-        return execute(client, CartUpdateCommand.of(cart, AddCustomLineItem.of(customLineItemDraft)));
-    }
-
-
-
-    private static void doSomething(final SphereClient client) {
-        final Cart cart = createCart(client);
-        final String sku = "book-sku";
-
-        final PagedQueryResult<ProductProjection> queryResult = execute(client, ProductProjectionQuery.ofCurrent()
-                .withPredicates(product -> product.allVariants().where(variant -> variant.sku().is(sku))));
-
-        if (!queryResult.getResults().isEmpty()) {
-            final ProductProjection productProjection = queryResult.getResults().get(0);
-            final String productId = productProjection.getId();
-            final Optional<ProductVariant> variantOptional = productProjection.findVariantBySky(sku);
-            if (variantOptional.isPresent()) {
-
-                final ProductVariant productVariant = variantOptional.get();
-                final int quantity = 1;
-
-                final Cart updatedCart = addToCart(client, cart, productId, productVariant, quantity);
-
-                final Cart cartWithMore = addCustomLineItem(client, updatedCart, productProjection, productVariant);
-
-                final String sapOrderNumber = RandomStringUtils.randomNumeric(12);
-
-
-                final OrderFromCartDraft draft = OrderFromCartDraft.of(cartWithMore, sapOrderNumber, PaymentState.PENDING);
-                final Order order = execute(client, OrderFromCartCreateCommand.of(draft));
-            }
-        }
-    }
-
-    private static Cart createCart(final SphereClient client) {
-        final CartDraft cartDraft = CartDraft.of(EUR)
-                .withCountry(CountryCode.DE);
-        final CartCreateCommand cartCreateCommand = CartCreateCommand.of(cartDraft);
-        return execute(client, cartCreateCommand);
-    }
-
-    private static Cart changeLineItemQuantity(final SphereClient client, final Cart cart) {
-        final ChangeLineItemQuantity changeLineItemQuantity = ChangeLineItemQuantity.of(cart.getLineItems().get(0).getId(), 4);
-        return execute(client, CartUpdateCommand.of(cart, changeLineItemQuantity));
-    }
-
-    private static Cart addToCart(final SphereClient client, final Cart cart, final String productId, final ProductVariant productVariant, final int quantity) {
-        final AddLineItem addLineItem = AddLineItem.of(productId, productVariant.getId(), quantity);
-        final SetShippingAddress setShippingAddress = SetShippingAddress.of(Address.of(CountryCode.DE));
-        final List<UpdateAction<Cart>> updateActions = asList(addLineItem, setShippingAddress);
-        return execute(client, CartUpdateCommand.of(cart, updateActions));
-    }
-
-    private static <T> T execute(final SphereClient client, final SphereRequest<T> sphereRequest) {
-        return client.execute(sphereRequest).toCompletableFuture().join();
-    }
-
+    public static final String SKU = "book-sku"; // TODO set a real sku in your project which has a tax category!
+    public static final String CUSTOM_TYPE_KEY = "sap-type";
 
     public static void main(String[] args) throws IOException {
         final Properties prop = loadCommercetoolsPlatformProperties();
@@ -118,16 +45,81 @@ public class Main {
         final String clientId = prop.getProperty("clientId");
         final String clientSecret = prop.getProperty("clientSecret");
         final SphereClientConfig clientConfig = SphereClientConfig.of(projectKey, clientId, clientSecret);
+
         try(final SphereClient client = SphereClientFactory.of().createClient(clientConfig)) {
-            doSomething(client);
+            createTypeForExtendedCustomLineItem(client);
+
+            final ProductProjection product = getSomeProduct(client);
+            final Cart cart = getSomeCartWithThisProduct(client, product);
+            final LineItem lineItemInCart = getLineItemInCart(cart);
+
+            final Cart updatedCart = addExtendedCustomLineItemWithProductInfoAndPriceFromSap(client, product, cart, lineItemInCart);
+            System.err.println(updatedCart);
         }
     }
 
+    private static Cart addExtendedCustomLineItemWithProductInfoAndPriceFromSap(final SphereClient client, final ProductProjection product, final Cart cart, final LineItem lineItemInCart) {
+        final CustomLineItemDraft customLineItemDraft = CustomLineItemDraft.of(product.getName(), "product-sap", getFinalPriceFromSap(), product.getTaxCategory(), lineItemInCart.getQuantity());
+        final List<UpdateAction<Cart>> updateActions = asList(AddCustomLineItem.of(customLineItemDraft), RemoveLineItem.of(lineItemInCart));
+        final Cart cartWithCustomLineItem = execute(client, CartUpdateCommand.of(cart, updateActions));
 
+        final Map<String, Object> values = new HashMap<>();
+        values.put("productId", product.getId());
+        values.put("productSlug", product.getSlug());
+        values.put("productSku", product.getMasterVariant().getSku());
+        final SetCustomLineItemCustomType setCustomLineItemCustomType = SetCustomLineItemCustomType
+                .ofTypeKeyAndObjects(CUSTOM_TYPE_KEY, values, getCustomLineItemInCart(cartWithCustomLineItem));
+        return execute(client, CartUpdateCommand.of(cartWithCustomLineItem, setCustomLineItemCustomType));
+    }
+
+    private static Type createTypeForExtendedCustomLineItem(final SphereClient client) {
+        // This is only executed (or created) once, this doesn't need to be here in a real example
+        final PagedQueryResult<Type> result = execute(client, TypeQuery.of().withPredicates(type -> type.key().is(CUSTOM_TYPE_KEY)));
+
+        if (result.getResults().isEmpty()) {
+            final TypeDraft typeDraft = TypeDraftBuilder.of(CUSTOM_TYPE_KEY, LocalizedString.of(ENGLISH, "CustomLineItem with product"), asSet("custom-line-item"))
+                    .fieldDefinitions(asList(
+                            FieldDefinition.of(StringType.of(), "productId", LocalizedString.of(ENGLISH, "Product ID"), true, SINGLE_LINE),
+                            FieldDefinition.of(LocalizedStringType.of(), "productSlug", LocalizedString.of(ENGLISH, "Product Slug"), true, SINGLE_LINE),
+                            FieldDefinition.of(StringType.of(), "productSku", LocalizedString.of(ENGLISH, "SKU"), true, SINGLE_LINE)))
+                    .build();
+            return execute(client, TypeCreateCommand.of(typeDraft));
+        } else {
+            return result.getResults().get(0);
+        }
+    }
+
+    private static String getCustomLineItemInCart(final Cart cartWithCustomLineItem) {
+        return cartWithCustomLineItem.getCustomLineItems().get(0).getId(); // TODO find nicely by slug
+    }
+
+    private static LineItem getLineItemInCart(final Cart cart) {
+        return cart.getLineItems().get(0);
+    }
+
+    private static Cart getSomeCartWithThisProduct(final SphereClient client, final ProductProjection product) {
+        final Cart cart = execute(client, CartCreateCommand.of(CartDraft.of(DefaultCurrencyUnits.EUR)));
+        final int quantity = 2;
+        return execute(client, CartUpdateCommand.of(cart, AddLineItem.of(product, product.getMasterVariant().getId(), quantity)));
+    }
+
+    private static Money getFinalPriceFromSap() {
+        return Money.of(BigDecimal.TEN, DefaultCurrencyUnits.EUR); // TODO fetch price from SAP
+    }
+
+    private static ProductProjection getSomeProduct(final SphereClient client) {
+        final PagedQueryResult<ProductProjection> result = execute(client, ProductProjectionQuery.ofCurrent()
+                .withPredicates(product -> product.allVariants().where(variant -> variant.sku().is(SKU))));
+        return result.getResults().get(0);
+    }
 
     private static Properties loadCommercetoolsPlatformProperties() throws IOException {
         final Properties prop = new Properties();
         prop.load(Main.class.getClassLoader().getResourceAsStream("dev.properties"));
         return prop;
+    }
+
+    private static <T> T execute(final SphereClient client, final SphereRequest<T> sphereRequest) {
+        return client.execute(sphereRequest).toCompletableFuture().join();
     }
 }
