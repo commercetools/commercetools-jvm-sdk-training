@@ -8,6 +8,7 @@ import io.sphere.sdk.carts.commands.updateactions.AddCustomLineItem;
 import io.sphere.sdk.carts.commands.updateactions.AddLineItem;
 import io.sphere.sdk.carts.commands.updateactions.RemoveCustomLineItem;
 import io.sphere.sdk.carts.commands.updateactions.RemoveLineItem;
+import io.sphere.sdk.carts.queries.CartByIdGet;
 import io.sphere.sdk.carts.queries.CartQuery;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.client.SphereClientConfig;
@@ -69,11 +70,17 @@ public class Main {
             final Cart cart = createCart(client, customerNumber);
             printCart(cart, "Empty cart created:");
 
+            final String sessionCartId = cart.getId();
+
+            // Many pages are clicked...
+
+            final Cart cartFetchedFromSession = execute(client, CartByIdGet.of(sessionCartId));
+
             // When clicked on "add to cart" we add a product to the cart, which contains a non-customized price
             final int quantity = 3;
             final ProductProjection product = getSomeProduct(client);
             final ProductVariant variant = product.getMasterVariant(); // TODO find variant requested
-            final Cart cartWithLineItem = addProductToCart(client, cart, product, variant, quantity);
+            final Cart cartWithLineItem = addProductToCart(client, cartFetchedFromSession, product, variant, quantity);
             printCart(cartWithLineItem, "Cart with regular line items:");
 
             // When clicked on "refresh price" we replace the line items with custom line items, which contain the price from the external system
@@ -92,7 +99,7 @@ public class Main {
             final Cart finalCart = addProductToCartWithCustomizedPrice(client, cartWithMoreProductsAndPrices, someOtherProduct, someOtherVariant, anotherQuantity);
             printCart(finalCart, "Cart with an additional custom line item with another product and customized price");
 
-            // List carts with this customer number
+            // On "Orders history" page, list carts with this customer number
             printCartsByCustomerNumber(client, customerNumber);
 
             // Clean up project to avoid conflicts for next iteration
