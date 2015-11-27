@@ -47,6 +47,12 @@ public class Main {
         final String slug = productVariant.getSku();
         final Reference<TaxCategory> taxCategory = productProjection.getTaxCategory();
         final int quantity = 1;
+
+        //TODO
+        //values.put("productId", productProjection.getId());
+        //values.put("productSlug", productProjection.getSlug());
+        //values.put("productSku", productVariant.getSku());
+
         final CustomLineItemDraft customLineItemDraft = CustomLineItemDraft.of(name, slug, monetaryAmount, taxCategory, quantity);
         return execute(client, CartUpdateCommand.of(cart, AddCustomLineItem.of(customLineItemDraft)));
     }
