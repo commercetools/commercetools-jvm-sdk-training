@@ -8,6 +8,7 @@ import io.sphere.sdk.carts.commands.updateactions.AddCustomLineItem;
 import io.sphere.sdk.carts.commands.updateactions.AddLineItem;
 import io.sphere.sdk.carts.commands.updateactions.RemoveCustomLineItem;
 import io.sphere.sdk.carts.commands.updateactions.RemoveLineItem;
+import io.sphere.sdk.carts.queries.CartQuery;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.client.SphereClientConfig;
 import io.sphere.sdk.client.SphereClientFactory;
@@ -17,6 +18,7 @@ import io.sphere.sdk.models.LocalizedString;
 import io.sphere.sdk.products.ProductProjection;
 import io.sphere.sdk.products.queries.ProductProjectionByIdGet;
 import io.sphere.sdk.products.queries.ProductProjectionQuery;
+import io.sphere.sdk.queries.QueryPredicate;
 import io.sphere.sdk.types.*;
 import io.sphere.sdk.types.commands.TypeCreateCommand;
 import io.sphere.sdk.types.commands.TypeDeleteCommand;
@@ -62,7 +64,7 @@ public class Main {
             System.err.println(typeForCarts);
 
             // We create a cart at some moment, e.g. when the customer logs in
-            final String customerNumber = "4536456435";
+            final String customerNumber = "34563463456";
             final Cart cart = createCart(client, customerNumber);
             printCart(cart, "Empty cart created:");
 
@@ -72,22 +74,34 @@ public class Main {
             final Cart cartWithLineItem = addProductToCart(client, cart, product, quantity);
             printCart(cartWithLineItem, "Cart with regular line items:");
 
-            // When clicked on "refresh price" we replace the line items with custom line items, which contain the price from SAP
+            // When clicked on "refresh price" we replace the line items with custom line items, which contain the price from the external system
             final Cart cartWithProductAndPrice = updateCartWithCustomPrices(client, cartWithLineItem);
-            printCart(cartWithProductAndPrice, "Cart with line items with SAP price:");
+            printCart(cartWithProductAndPrice, "Cart with custom line items with customized price:");
 
-            // When after having refreshed the price
+            // When after having refreshed the price the customer decides to add more units
             final int additionalQuantity = 2;
-            final Cart cartWithMoreProductsAndPrices = addProductToCartWithSapPrice(client, cartWithProductAndPrice, product, additionalQuantity);
-            printCart(cartWithMoreProductsAndPrices, "Cart with 2 additional units with the same product and SAP price");
+            final Cart cartWithMoreProductsAndPrices = addProductToCartWithCustomizedPrice(client, cartWithProductAndPrice, product, additionalQuantity);
+            printCart(cartWithMoreProductsAndPrices, "Cart with 2 additional units with the same product and customized price");
 
+            // When after having refreshed the price the customer decides to add more products
             final int anotherQuantity = 2;
-            final Cart finalCart = addProductToCartWithSapPrice(client, cartWithMoreProductsAndPrices, getSomeOtherProduct(client), anotherQuantity);
-            printCart(finalCart, "Cart with an additional line item with another product and SAP price");
+            final Cart finalCart = addProductToCartWithCustomizedPrice(client, cartWithMoreProductsAndPrices, getSomeOtherProduct(client), anotherQuantity);
+            printCart(finalCart, "Cart with an additional custom line item with another product and customized price");
+
+            // List carts with this customer number
+            printCartsByCustomerNumber(client, customerNumber);
 
             // Clean up project to avoid conflicts for next iteration
             cleanUpProject(client, typeForCustomLineItems, finalCart);
         }
+    }
+
+    private static void printCartsByCustomerNumber(final SphereClient client, final String customerNumber) {
+        System.err.println("");
+        System.err.println("List of carts with customer number " + customerNumber);
+
+        final QueryPredicate<Cart> queryPredicate = QueryPredicate.of(String.format("custom(fields(customerNumber = \"%s\"))", customerNumber));
+        execute(client, CartQuery.of().withPredicates(queryPredicate)).getResults().forEach(System.err::println);
     }
 
     private static void printCart(final Cart cart, final String message) {
@@ -128,14 +142,14 @@ public class Main {
     }
 
     private static CustomLineItemDraft createCustomLineItemFromProduct(final ProductProjection product, final long quantity) {
-        return CustomLineItemDraft.of(product.getName(), product.getId(), getFinalPriceFromSap(), product.getTaxCategory(), quantity);
+        return CustomLineItemDraft.of(product.getName(), product.getId(), getFinalPriceFromExternalSystem(), product.getTaxCategory(), quantity);
     }
 
     private static Cart addProductToCart(final SphereClient client, final Cart cart, final ProductProjection product, final int quantity) {
         return execute(client, CartUpdateCommand.of(cart, AddLineItem.of(product, product.getMasterVariant().getId(), quantity)));
     }
 
-    private static Cart addProductToCartWithSapPrice(final SphereClient client, final Cart cart, final ProductProjection product, final int quantity) {
+    private static Cart addProductToCartWithCustomizedPrice(final SphereClient client, final Cart cart, final ProductProjection product, final int quantity) {
         final Optional<CustomLineItem> customLineItemForProduct = findCustomLineItemForProduct(cart, product);
         if (customLineItemForProduct.isPresent()) {
             final UpdateAction<Cart> addToCartAction = actionToCreateCustomLineItem(product, quantity + customLineItemForProduct.get().getQuantity());
@@ -182,8 +196,8 @@ public class Main {
         return execute(client, CartCreateCommand.of(CartDraft.of(EUR).withCustom(customFieldsDraft)));
     }
 
-    private static Money getFinalPriceFromSap() {
-        return Money.of(BigDecimal.TEN, EUR); // TODO fetch price from SAP
+    private static Money getFinalPriceFromExternalSystem() {
+        return Money.of(BigDecimal.TEN, EUR); // TODO fetch price from external system
     }
 
     private static ProductProjection getSomeProduct(final SphereClient client) {
