@@ -38,6 +38,9 @@ public class Main {
 
     public static final String SKU = "book-sku"; // TODO set a real sku in your project which has a tax category!
     public static final String CUSTOM_TYPE_KEY = "sap-type";
+    public static final String PRODUCT_ID_FIELD = "productId";
+    public static final String PRODUCT_SLUG_FIELD = "productSlug";
+    public static final String PRODUCT_SKU_FIELD = "productSku";
 
     public static void main(String[] args) throws IOException {
         final Properties prop = loadCommercetoolsPlatformProperties();
@@ -64,9 +67,9 @@ public class Main {
         final Cart cartWithCustomLineItem = execute(client, CartUpdateCommand.of(cart, updateActions));
 
         final Map<String, Object> values = new HashMap<>();
-        values.put("productId", product.getId());
-        values.put("productSlug", product.getSlug());
-        values.put("productSku", product.getMasterVariant().getSku());
+        values.put(PRODUCT_ID_FIELD, product.getId());
+        values.put(PRODUCT_SLUG_FIELD, product.getSlug());
+        values.put(PRODUCT_SKU_FIELD, product.getMasterVariant().getSku());
         final SetCustomLineItemCustomType setCustomLineItemCustomType = SetCustomLineItemCustomType
                 .ofTypeKeyAndObjects(CUSTOM_TYPE_KEY, values, getCustomLineItemInCart(cartWithCustomLineItem));
         return execute(client, CartUpdateCommand.of(cartWithCustomLineItem, setCustomLineItemCustomType));
@@ -79,9 +82,9 @@ public class Main {
         if (result.getResults().isEmpty()) {
             final TypeDraft typeDraft = TypeDraftBuilder.of(CUSTOM_TYPE_KEY, LocalizedString.of(ENGLISH, "CustomLineItem with product"), asSet("custom-line-item"))
                     .fieldDefinitions(asList(
-                            FieldDefinition.of(StringType.of(), "productId", LocalizedString.of(ENGLISH, "Product ID"), true, SINGLE_LINE),
-                            FieldDefinition.of(LocalizedStringType.of(), "productSlug", LocalizedString.of(ENGLISH, "Product Slug"), true, SINGLE_LINE),
-                            FieldDefinition.of(StringType.of(), "productSku", LocalizedString.of(ENGLISH, "SKU"), true, SINGLE_LINE)))
+                            FieldDefinition.of(StringType.of(), PRODUCT_ID_FIELD, LocalizedString.of(ENGLISH, "Product ID"), true, SINGLE_LINE),
+                            FieldDefinition.of(LocalizedStringType.of(), PRODUCT_SLUG_FIELD, LocalizedString.of(ENGLISH, "Product Slug"), true, SINGLE_LINE),
+                            FieldDefinition.of(StringType.of(), PRODUCT_SKU_FIELD, LocalizedString.of(ENGLISH, "SKU"), true, SINGLE_LINE)))
                     .build();
             return execute(client, TypeCreateCommand.of(typeDraft));
         } else {
