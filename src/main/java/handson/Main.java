@@ -16,8 +16,8 @@ import io.sphere.sdk.client.SphereClientFactory;
 import io.sphere.sdk.client.SphereRequest;
 import io.sphere.sdk.commands.UpdateAction;
 import io.sphere.sdk.models.Address;
-import io.sphere.sdk.models.DefaultCurrencyUnits;
 import io.sphere.sdk.models.LocalizedString;
+import io.sphere.sdk.models.Reference;
 import io.sphere.sdk.orders.Order;
 import io.sphere.sdk.orders.OrderFromCartDraft;
 import io.sphere.sdk.orders.PaymentState;
@@ -26,12 +26,13 @@ import io.sphere.sdk.products.ProductProjection;
 import io.sphere.sdk.products.ProductVariant;
 import io.sphere.sdk.products.queries.ProductProjectionQuery;
 import io.sphere.sdk.queries.PagedQueryResult;
+import io.sphere.sdk.taxcategories.TaxCategory;
 import io.sphere.sdk.utils.MoneyImpl;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import javax.money.MonetaryAmount;
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -40,10 +41,13 @@ import static java.util.Arrays.asList;
 
 public class Main {
 
-    private static Cart addCustomLineItem(final SphereClient client, final Cart cart) {
-        final LocalizedString name = LocalizedString.of(Locale.ENGLISH, "name");
-        final MonetaryAmount monetaryAmount = MoneyImpl.ofCents(1234, EUR);
-        final CustomLineItemDraft customLineItemDraft = CustomLineItemDraft.of(name, "product-xyz", monetaryAmount, null, 1);
+    private static Cart addCustomLineItem(final SphereClient client, final Cart cart, final ProductProjection productProjection, final ProductVariant productVariant) {
+        final LocalizedString name = productProjection.getName();
+        final MonetaryAmount monetaryAmount = MoneyImpl.ofCents(1234, EUR);//this can come from SAP
+        final String slug = productVariant.getSku();
+        final Reference<TaxCategory> taxCategory = productProjection.getTaxCategory();
+        final int quantity = 1;
+        final CustomLineItemDraft customLineItemDraft = CustomLineItemDraft.of(name, slug, monetaryAmount, taxCategory, quantity);
         return execute(client, CartUpdateCommand.of(cart, AddCustomLineItem.of(customLineItemDraft)));
     }
 
@@ -67,9 +71,9 @@ public class Main {
 
                 final Cart updatedCart = addToCart(client, cart, productId, productVariant, quantity);
 
-                final Cart cartWithMore = addCustomLineItem(client, updatedCart);
+                final Cart cartWithMore = addCustomLineItem(client, updatedCart, productProjection, productVariant);
 
-                final String sapOrderNumber = "012345";
+                final String sapOrderNumber = RandomStringUtils.randomNumeric(12);
 
 
                 final OrderFromCartDraft draft = OrderFromCartDraft.of(cartWithMore, sapOrderNumber, PaymentState.PENDING);
