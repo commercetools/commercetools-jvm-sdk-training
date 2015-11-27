@@ -6,8 +6,8 @@ import io.sphere.sdk.carts.commands.CartDeleteCommand;
 import io.sphere.sdk.carts.commands.CartUpdateCommand;
 import io.sphere.sdk.carts.commands.updateactions.AddCustomLineItem;
 import io.sphere.sdk.carts.commands.updateactions.AddLineItem;
+import io.sphere.sdk.carts.commands.updateactions.RemoveCustomLineItem;
 import io.sphere.sdk.carts.commands.updateactions.RemoveLineItem;
-import io.sphere.sdk.carts.commands.updateactions.SetCustomLineItemCustomType;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.client.SphereClientConfig;
 import io.sphere.sdk.client.SphereClientFactory;
@@ -34,7 +34,7 @@ import static java.util.Arrays.asList;
 import static java.util.Locale.ENGLISH;
 
 public class Main {
-    public static final String CUSTOM_TYPE_KEY = "sap-type5";
+    public static final String CUSTOM_TYPE_KEY = "sap-type6";
     public static final String PRODUCT_ID_FIELD = "productId";
     public static final String PRODUCT_SLUG_FIELD = "productSlug";
     public static final String PRODUCT_SKU_FIELD = "productSku";
@@ -54,62 +54,55 @@ public class Main {
 
             // We create a cart at some moment, e.g. when the customer logs in
             final Cart cart = createCart(client);
-            System.err.println("");
-            System.err.println("Empty cart created:");
-            System.err.println(cart);
+            printCart(cart, "Empty cart created:");
 
             // When clicked on "add to cart" we add a product to the cart, which contains a non-customized price
             final int quantity = 3;
             final ProductProjection product = getSomeProduct(client);
             final Cart cartWithLineItem = addProductToCart(client, cart, product, quantity);
-            System.err.println("");
-            System.err.println("Cart with regular line items:");
-            System.err.println(cartWithLineItem);
+            printCart(cartWithLineItem, "Cart with regular line items:");
 
             // When clicked on "refresh price" we replace the line items with custom line items, which contain the price from SAP
             final Cart cartWithProductAndPrice = updateCartWithCustomPrices(client, cartWithLineItem);
-            System.err.println("");
-            System.err.println("Cart with line items with SAP price:");
-            System.err.println(cartWithProductAndPrice);
-//
-//            final Cart cartWithMoreProductsAndPrices = addProductToCartWithSapPrice(client, cartWithProductAndPrice, product, 2);
-//
-//            final Cart finalCart = addProductToCartWithSapPrice(client, cartWithMoreProductsAndPrices, getSomeOtherProduct(client), 2);
+            printCart(cartWithProductAndPrice, "Cart with line items with SAP price:");
+
+            final Cart cartWithMoreProductsAndPrices = addProductToCartWithSapPrice(client, cartWithProductAndPrice, product, 2);
+            printCart(cartWithMoreProductsAndPrices, "Cart with 2 additional units with the same product and SAP price");
+
+            final Cart finalCart = addProductToCartWithSapPrice(client, cartWithMoreProductsAndPrices, getSomeOtherProduct(client), 2);
+            printCart(finalCart, "Cart with an additional line item with another product and SAP price");
 
             // Clean up project to avoid conflicts for next iteration
-            cleanUpProject(client, typeForCustomLineItems, cartWithProductAndPrice);
+            cleanUpProject(client, typeForCustomLineItems, finalCart);
         }
+    }
+
+    private static void printCart(final Cart cart, final String message) {
+        System.err.println("");
+        System.err.println(message);
+        System.err.println("Line items:");
+        cart.getLineItems().forEach(System.err::println);
+        System.err.println("Custom line items:");
+        cart.getCustomLineItems().forEach(System.err::println);
     }
 
     private static Cart updateCartWithCustomPrices(final SphereClient client, final Cart cart) {
-        final Map<String, Map<String, Object>> productInfoMap = new HashMap<>(); // productId -> productInfo map
-
-        // Replace line item for custom line item
-        final List<UpdateAction<Cart>> replaceLineItemsUpdateActions = new ArrayList<>(); // list of actions to replace line items for the corresponding custom line items
+        final List<UpdateAction<Cart>> replaceLineItemsUpdateActions = new ArrayList<>();
         for (final LineItem lineItem : cart.getLineItems()) {
             final ProductProjection productFromLineItem = getProductFromLineItem(client, lineItem);
             replaceLineItemsUpdateActions.addAll(actionToReplaceLineItemWithCustomLineItem(productFromLineItem, lineItem));
-            productInfoMap.put(lineItem.getProductId(), extractInfoFromProduct(productFromLineItem));
         }
-        final Cart cartWithCustomLineItems = execute(client, CartUpdateCommand.of(cart, replaceLineItemsUpdateActions));
-
-        // Update custom line item with product info
-        final List<UpdateAction<Cart>> updateProductInfoActions = new ArrayList<>(); // list of actions to update custom line items with the corresponding product info
-        for (final CustomLineItem customLineItem : cartWithCustomLineItems.getCustomLineItems()) {
-            final Map<String, Object> productInfo = productInfoMap.get(customLineItem.getSlug());
-            updateProductInfoActions.add(actionToAddProductInfoFieldsInCustomLineItem(customLineItem, productInfo));
-        }
-        return execute(client, CartUpdateCommand.of(cartWithCustomLineItems, updateProductInfoActions));
+        return execute(client, CartUpdateCommand.of(cart, replaceLineItemsUpdateActions));
     }
 
     private static List<UpdateAction<Cart>> actionToReplaceLineItemWithCustomLineItem(final ProductProjection productFromLineItem, final LineItem lineItem) {
-        final CustomLineItemDraft customLineItemDraft = createCustomLineItemFromProduct(productFromLineItem, lineItem.getQuantity());
-        return asList(AddCustomLineItem.of(customLineItemDraft), RemoveLineItem.of(lineItem));
+        return asList(RemoveLineItem.of(lineItem), actionToCreateCustomLineItem(productFromLineItem, lineItem.getQuantity()));
     }
 
-    private static UpdateAction<Cart> actionToAddProductInfoFieldsInCustomLineItem(final CustomLineItem customLineItem,
-                                                                                   final Map<String, Object> productInfo) {
-        return SetCustomLineItemCustomType.ofTypeKeyAndObjects(CUSTOM_TYPE_KEY, productInfo, customLineItem.getId());
+    private static UpdateAction<Cart> actionToCreateCustomLineItem(final ProductProjection productFromLineItem, final long quantity) {
+        final CustomLineItemDraft customLineItemDraft = createCustomLineItemFromProduct(productFromLineItem, quantity);
+        final CustomFieldsDraft customFieldsDraft = CustomFieldsDraft.ofTypeKeyAndObjects(CUSTOM_TYPE_KEY, extractInfoFromProduct(productFromLineItem));
+        return AddCustomLineItem.of(customLineItemDraft).withCustom(customFieldsDraft);
     }
 
     private static Map<String, Object> extractInfoFromProduct(final ProductProjection product) {
@@ -128,24 +121,15 @@ public class Main {
         return execute(client, CartUpdateCommand.of(cart, AddLineItem.of(product, product.getMasterVariant().getId(), quantity)));
     }
 
-//    private static Cart addProductToCartWithSapPrice(final SphereClient client, final Cart cart, final ProductProjection product, final int quantity) {
-//        final Optional<CustomLineItem> customLineItemForProduct = findCustomLineItemForProduct(cart, product);
-//        if (customLineItemForProduct.isPresent()) {
-//            customLineItemForProduct.
-//        } else {
-//
-//        }
-//
-//        final CustomLineItemDraft customLineItemDraft = createCustomLineItemFromProduct(product, quantity);
-//        final Cart cartWithCustomLineItem = execute(client, CartUpdateCommand.of(cart, AddCustomLineItem.of(customLineItemDraft)));
-//
-//        final Map<String, Object> productInfo = extractInfoFromProduct(product);
-//        final List<UpdateAction<Cart>> updateProductInfoActions = new ArrayList<>();
-//        for (final CustomLineItem customLineItem : findCustomLineItemsWithoutProductInfo(cartWithCustomLineItem, product)) {
-//             updateProductInfoActions.add(actionToAddProductInfoFieldsInCustomLineItem(customLineItem, productInfo));
-//        }
-//        return execute(client, CartUpdateCommand.of(cartWithCustomLineItem, updateProductInfoActions));
-//    }
+    private static Cart addProductToCartWithSapPrice(final SphereClient client, final Cart cart, final ProductProjection product, final int quantity) {
+        final Optional<CustomLineItem> customLineItemForProduct = findCustomLineItemForProduct(cart, product);
+        if (customLineItemForProduct.isPresent()) {
+            final UpdateAction<Cart> addToCartAction = actionToCreateCustomLineItem(product, quantity + customLineItemForProduct.get().getQuantity());
+            return execute(client, CartUpdateCommand.of(cart, asList(RemoveCustomLineItem.of(customLineItemForProduct.get()), addToCartAction)));
+        } else {
+            return execute(client, CartUpdateCommand.of(cart, actionToCreateCustomLineItem(product, quantity)));
+        }
+    }
 
     private static Optional<CustomLineItem> findCustomLineItemForProduct(final Cart cart, final ProductProjection product) {
         return cart.getCustomLineItems().stream()
