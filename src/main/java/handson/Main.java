@@ -74,6 +74,7 @@ public class Main {
 
             // Many pages are clicked...
 
+            // First we fetch our cart from the session
             final Cart cartFetchedFromSession = execute(client, CartByIdGet.of(sessionCartId));
 
             // When clicked on "add to cart" we add a product to the cart, which contains a non-customized price
