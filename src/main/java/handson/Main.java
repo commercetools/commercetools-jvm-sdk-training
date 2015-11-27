@@ -20,6 +20,7 @@ import io.sphere.sdk.products.queries.ProductProjectionQuery;
 import io.sphere.sdk.types.*;
 import io.sphere.sdk.types.commands.TypeCreateCommand;
 import io.sphere.sdk.types.commands.TypeDeleteCommand;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.javamoney.moneta.Money;
 
 import java.io.IOException;
@@ -31,13 +32,16 @@ import static io.sphere.sdk.models.TextInputHint.*;
 import static io.sphere.sdk.products.ProductProjectionType.CURRENT;
 import static io.sphere.sdk.utils.SetUtils.asSet;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Locale.ENGLISH;
 
 public class Main {
-    public static final String CUSTOM_TYPE_KEY = "sap-type6";
+    public static final String CUSTOM_LINE_ITEM_TYPE_KEY = RandomStringUtils.randomAlphanumeric(10);
+    public static final String CART_TYPE_KEY = RandomStringUtils.randomAlphanumeric(10);
     public static final String PRODUCT_ID_FIELD = "productId";
     public static final String PRODUCT_SLUG_FIELD = "productSlug";
     public static final String PRODUCT_SKU_FIELD = "productSku";
+    public static final String CUSTOMER_NUMBER_FIELD = "customerNumber";
 
     public static void main(String[] args) throws IOException {
         final Properties prop = loadCommercetoolsPlatformProperties();
@@ -48,12 +52,18 @@ public class Main {
 
         try(final SphereClient client = SphereClientFactory.of().createClient(clientConfig)) {
             // Done only once at creation of the project
-            final Type typeForCustomLineItems = createTypeForExtendedCustomLineItem(client);
+            final Type typeForCustomLineItems = createTypeForExtendedCustomLineItems(client);
             System.err.println("Created typeForCustomLineItems for extending custom line items with product information:");
             System.err.println(typeForCustomLineItems);
 
+            // Done only once at creation of the project
+            final Type typeForCarts = createTypeForExtendedCarts(client);
+            System.err.println("Created typeForCart for extending carts with customer number:");
+            System.err.println(typeForCarts);
+
             // We create a cart at some moment, e.g. when the customer logs in
-            final Cart cart = createCart(client);
+            final String customerNumber = "4536456435";
+            final Cart cart = createCart(client, customerNumber);
             printCart(cart, "Empty cart created:");
 
             // When clicked on "add to cart" we add a product to the cart, which contains a non-customized price
@@ -66,10 +76,13 @@ public class Main {
             final Cart cartWithProductAndPrice = updateCartWithCustomPrices(client, cartWithLineItem);
             printCart(cartWithProductAndPrice, "Cart with line items with SAP price:");
 
-            final Cart cartWithMoreProductsAndPrices = addProductToCartWithSapPrice(client, cartWithProductAndPrice, product, 2);
+            // When after having refreshed the price
+            final int additionalQuantity = 2;
+            final Cart cartWithMoreProductsAndPrices = addProductToCartWithSapPrice(client, cartWithProductAndPrice, product, additionalQuantity);
             printCart(cartWithMoreProductsAndPrices, "Cart with 2 additional units with the same product and SAP price");
 
-            final Cart finalCart = addProductToCartWithSapPrice(client, cartWithMoreProductsAndPrices, getSomeOtherProduct(client), 2);
+            final int anotherQuantity = 2;
+            final Cart finalCart = addProductToCartWithSapPrice(client, cartWithMoreProductsAndPrices, getSomeOtherProduct(client), anotherQuantity);
             printCart(finalCart, "Cart with an additional line item with another product and SAP price");
 
             // Clean up project to avoid conflicts for next iteration
@@ -80,6 +93,7 @@ public class Main {
     private static void printCart(final Cart cart, final String message) {
         System.err.println("");
         System.err.println(message);
+        System.err.println("Customer number: " + cart.getCustom().getFieldAsString(CUSTOMER_NUMBER_FIELD));
         System.err.println("Line items:");
         cart.getLineItems().forEach(System.err::println);
         System.err.println("Custom line items:");
@@ -101,7 +115,7 @@ public class Main {
 
     private static UpdateAction<Cart> actionToCreateCustomLineItem(final ProductProjection productFromLineItem, final long quantity) {
         final CustomLineItemDraft customLineItemDraft = createCustomLineItemFromProduct(productFromLineItem, quantity);
-        final CustomFieldsDraft customFieldsDraft = CustomFieldsDraft.ofTypeKeyAndObjects(CUSTOM_TYPE_KEY, extractInfoFromProduct(productFromLineItem));
+        final CustomFieldsDraft customFieldsDraft = CustomFieldsDraft.ofTypeKeyAndObjects(CUSTOM_LINE_ITEM_TYPE_KEY, extractInfoFromProduct(productFromLineItem));
         return AddCustomLineItem.of(customLineItemDraft).withCustom(customFieldsDraft);
     }
 
@@ -137,9 +151,18 @@ public class Main {
                 .findFirst();
     }
 
-    private static Type createTypeForExtendedCustomLineItem(final SphereClient client) {
+    private static Type createTypeForExtendedCarts(final SphereClient client) {
         // This is only executed (or created) once, this doesn't need to be here in a real example
-        final TypeDraft typeDraft = TypeDraftBuilder.of(CUSTOM_TYPE_KEY, LocalizedString.of(ENGLISH, "CustomLineItem with product"), asSet("custom-line-item"))
+        final TypeDraft typeDraft = TypeDraftBuilder.of(CART_TYPE_KEY, LocalizedString.of(ENGLISH, "Cart with customer number"), asSet("order"))
+                .fieldDefinitions(singletonList(
+                        FieldDefinition.of(StringType.of(), CUSTOMER_NUMBER_FIELD, LocalizedString.of(ENGLISH, "Customer number"), false, SINGLE_LINE)
+                )).build();
+        return execute(client, TypeCreateCommand.of(typeDraft));
+    }
+
+    private static Type createTypeForExtendedCustomLineItems(final SphereClient client) {
+        // This is only executed (or created) once, this doesn't need to be here in a real example
+        final TypeDraft typeDraft = TypeDraftBuilder.of(CUSTOM_LINE_ITEM_TYPE_KEY, LocalizedString.of(ENGLISH, "CustomLineItem with product"), asSet("custom-line-item"))
                 .fieldDefinitions(asList(
                         FieldDefinition.of(StringType.of(), PRODUCT_ID_FIELD, LocalizedString.of(ENGLISH, "Product ID"), true, SINGLE_LINE),
                         FieldDefinition.of(LocalizedStringType.of(), PRODUCT_SLUG_FIELD, LocalizedString.of(ENGLISH, "Product Slug"), true, SINGLE_LINE),
@@ -152,8 +175,11 @@ public class Main {
         return execute(client, ProductProjectionByIdGet.of(lineItem.getProductId(), CURRENT));
     }
 
-    private static Cart createCart(final SphereClient client) {
-        return execute(client, CartCreateCommand.of(CartDraft.of(EUR)));
+    private static Cart createCart(final SphereClient client, final String customerNumber) {
+        final CustomFieldsDraft customFieldsDraft = CustomFieldsDraftBuilder.ofTypeKey(CART_TYPE_KEY)
+                .addObject(CUSTOMER_NUMBER_FIELD, customerNumber)
+                .build();
+        return execute(client, CartCreateCommand.of(CartDraft.of(EUR).withCustom(customFieldsDraft)));
     }
 
     private static Money getFinalPriceFromSap() {
