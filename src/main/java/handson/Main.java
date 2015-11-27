@@ -96,7 +96,7 @@ public class Main {
             // When after having refreshed the price the customer decides to add more products
             final int anotherQuantity = 2;
             final ProductProjection someOtherProduct = getSomeOtherProduct(client);
-            final ProductVariant someOtherVariant = someOtherProduct.getMasterVariant();
+            final ProductVariant someOtherVariant = someOtherProduct.getMasterVariant(); // TODO find variant requested
             final Cart finalCart = addProductToCartWithCustomizedPrice(client, cartWithMoreProductsAndPrices, someOtherProduct, someOtherVariant, anotherQuantity);
             printCart(finalCart, "Cart with an additional custom line item with another product and customized price");
 
@@ -104,7 +104,7 @@ public class Main {
             printCartsByCustomerNumber(client, customerNumber);
 
             // Clean up project to avoid conflicts for next iteration
-            cleanUpProject(client, typeForCustomLineItems, finalCart);
+            cleanUpProject(client, finalCart, typeForCustomLineItems, typeForCarts);
         }
     }
 
@@ -232,9 +232,11 @@ public class Main {
         return prop;
     }
 
-    private static void cleanUpProject(final SphereClient client, final Type typeForCustomLineItems, final Cart cartWithProductAndPrice) {
+    private static void cleanUpProject(final SphereClient client, final Cart cartWithProductAndPrice,
+                                       final Type typeForCustomLineItems, final Type typeForCarts) {
         execute(client, CartDeleteCommand.of(cartWithProductAndPrice));
         execute(client, TypeDeleteCommand.of(typeForCustomLineItems));
+        execute(client, TypeDeleteCommand.of(typeForCarts));
     }
 
     private static <T> T execute(final SphereClient client, final SphereRequest<T> sphereRequest) {
