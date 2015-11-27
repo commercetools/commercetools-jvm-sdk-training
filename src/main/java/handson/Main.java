@@ -16,6 +16,7 @@ import io.sphere.sdk.client.SphereRequest;
 import io.sphere.sdk.commands.UpdateAction;
 import io.sphere.sdk.models.LocalizedString;
 import io.sphere.sdk.products.ProductProjection;
+import io.sphere.sdk.products.ProductVariant;
 import io.sphere.sdk.products.queries.ProductProjectionByIdGet;
 import io.sphere.sdk.products.queries.ProductProjectionQuery;
 import io.sphere.sdk.queries.QueryPredicate;
@@ -71,7 +72,8 @@ public class Main {
             // When clicked on "add to cart" we add a product to the cart, which contains a non-customized price
             final int quantity = 3;
             final ProductProjection product = getSomeProduct(client);
-            final Cart cartWithLineItem = addProductToCart(client, cart, product, quantity);
+            final ProductVariant variant = product.getMasterVariant(); // TODO find variant requested
+            final Cart cartWithLineItem = addProductToCart(client, cart, product, variant, quantity);
             printCart(cartWithLineItem, "Cart with regular line items:");
 
             // When clicked on "refresh price" we replace the line items with custom line items, which contain the price from the external system
@@ -80,12 +82,14 @@ public class Main {
 
             // When after having refreshed the price the customer decides to add more units
             final int additionalQuantity = 2;
-            final Cart cartWithMoreProductsAndPrices = addProductToCartWithCustomizedPrice(client, cartWithProductAndPrice, product, additionalQuantity);
+            final Cart cartWithMoreProductsAndPrices = addProductToCartWithCustomizedPrice(client, cartWithProductAndPrice, product, variant, additionalQuantity);
             printCart(cartWithMoreProductsAndPrices, "Cart with 2 additional units with the same product and customized price");
 
             // When after having refreshed the price the customer decides to add more products
             final int anotherQuantity = 2;
-            final Cart finalCart = addProductToCartWithCustomizedPrice(client, cartWithMoreProductsAndPrices, getSomeOtherProduct(client), anotherQuantity);
+            final ProductProjection someOtherProduct = getSomeOtherProduct(client);
+            final ProductVariant someOtherVariant = someOtherProduct.getMasterVariant();
+            final Cart finalCart = addProductToCartWithCustomizedPrice(client, cartWithMoreProductsAndPrices, someOtherProduct, someOtherVariant, anotherQuantity);
             printCart(finalCart, "Cart with an additional custom line item with another product and customized price");
 
             // List carts with this customer number
@@ -117,19 +121,22 @@ public class Main {
     private static Cart updateCartWithCustomPrices(final SphereClient client, final Cart cart) {
         final List<UpdateAction<Cart>> replaceLineItemsUpdateActions = new ArrayList<>();
         for (final LineItem lineItem : cart.getLineItems()) {
-            final ProductProjection productFromLineItem = getProductFromLineItem(client, lineItem);
-            replaceLineItemsUpdateActions.addAll(actionToReplaceLineItemWithCustomLineItem(productFromLineItem, lineItem));
+            final ProductProjection product = getProductFromLineItem(client, lineItem);
+            final ProductVariant variant = product.findVariantBySky(lineItem.getVariant().getSku()).get();
+            replaceLineItemsUpdateActions.addAll(actionToReplaceLineItemWithCustomLineItem(product, variant, lineItem));
         }
         return execute(client, CartUpdateCommand.of(cart, replaceLineItemsUpdateActions));
     }
 
-    private static List<UpdateAction<Cart>> actionToReplaceLineItemWithCustomLineItem(final ProductProjection productFromLineItem, final LineItem lineItem) {
-        return asList(RemoveLineItem.of(lineItem), actionToCreateCustomLineItem(productFromLineItem, lineItem.getQuantity()));
+    private static List<UpdateAction<Cart>> actionToReplaceLineItemWithCustomLineItem(final ProductProjection product,
+                                                                                      final ProductVariant variant,
+                                                                                      final LineItem lineItem) {
+        return asList(RemoveLineItem.of(lineItem), actionToCreateCustomLineItem(product, variant, lineItem.getQuantity()));
     }
 
-    private static UpdateAction<Cart> actionToCreateCustomLineItem(final ProductProjection productFromLineItem, final long quantity) {
-        final CustomLineItemDraft customLineItemDraft = createCustomLineItemFromProduct(productFromLineItem, quantity);
-        final CustomFieldsDraft customFieldsDraft = CustomFieldsDraft.ofTypeKeyAndObjects(CUSTOM_LINE_ITEM_TYPE_KEY, extractInfoFromProduct(productFromLineItem));
+    private static UpdateAction<Cart> actionToCreateCustomLineItem(final ProductProjection product, final ProductVariant variant, final long quantity) {
+        final CustomLineItemDraft customLineItemDraft = createCustomLineItemFromProduct(product, variant, quantity);
+        final CustomFieldsDraft customFieldsDraft = CustomFieldsDraft.ofTypeKeyAndObjects(CUSTOM_LINE_ITEM_TYPE_KEY, extractInfoFromProduct(product));
         return AddCustomLineItem.of(customLineItemDraft).withCustom(customFieldsDraft);
     }
 
@@ -141,27 +148,30 @@ public class Main {
         return productInfo;
     }
 
-    private static CustomLineItemDraft createCustomLineItemFromProduct(final ProductProjection product, final long quantity) {
-        return CustomLineItemDraft.of(product.getName(), product.getId(), getFinalPriceFromExternalSystem(), product.getTaxCategory(), quantity);
+    private static CustomLineItemDraft createCustomLineItemFromProduct(final ProductProjection product, final ProductVariant variant, final long quantity) {
+        return CustomLineItemDraft.of(product.getName(), variant.getSku(), getFinalPriceFromExternalSystem(), product.getTaxCategory(), quantity);
     }
 
-    private static Cart addProductToCart(final SphereClient client, final Cart cart, final ProductProjection product, final int quantity) {
-        return execute(client, CartUpdateCommand.of(cart, AddLineItem.of(product, product.getMasterVariant().getId(), quantity)));
+    private static Cart addProductToCart(final SphereClient client, final Cart cart, final ProductProjection product,
+                                         final ProductVariant variant, final int quantity) {
+        return execute(client, CartUpdateCommand.of(cart, AddLineItem.of(product, variant.getId(), quantity)));
     }
 
-    private static Cart addProductToCartWithCustomizedPrice(final SphereClient client, final Cart cart, final ProductProjection product, final int quantity) {
-        final Optional<CustomLineItem> customLineItemForProduct = findCustomLineItemForProduct(cart, product);
+    private static Cart addProductToCartWithCustomizedPrice(final SphereClient client, final Cart cart, final ProductProjection product,
+                                                            final ProductVariant variant, final int quantity) {
+        final Optional<CustomLineItem> customLineItemForProduct = findCustomLineItemForProduct(cart, variant.getSku());
         if (customLineItemForProduct.isPresent()) {
-            final UpdateAction<Cart> addToCartAction = actionToCreateCustomLineItem(product, quantity + customLineItemForProduct.get().getQuantity());
+            final long newQuantity = quantity + customLineItemForProduct.get().getQuantity();
+            final UpdateAction<Cart> addToCartAction = actionToCreateCustomLineItem(product, variant, newQuantity);
             return execute(client, CartUpdateCommand.of(cart, asList(RemoveCustomLineItem.of(customLineItemForProduct.get()), addToCartAction)));
         } else {
-            return execute(client, CartUpdateCommand.of(cart, actionToCreateCustomLineItem(product, quantity)));
+            return execute(client, CartUpdateCommand.of(cart, actionToCreateCustomLineItem(product, variant, quantity)));
         }
     }
 
-    private static Optional<CustomLineItem> findCustomLineItemForProduct(final Cart cart, final ProductProjection product) {
+    private static Optional<CustomLineItem> findCustomLineItemForProduct(final Cart cart, final String sku) {
         return cart.getCustomLineItems().stream()
-                .filter(cli -> cli.getSlug().equals(product.getId()))
+                .filter(cli -> cli.getSlug().equals(sku))
                 .findFirst();
     }
 
