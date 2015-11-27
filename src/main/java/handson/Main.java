@@ -50,22 +50,26 @@ public class Main {
         final SphereClientConfig clientConfig = SphereClientConfig.of(projectKey, clientId, clientSecret);
 
         try(final SphereClient client = SphereClientFactory.of().createClient(clientConfig)) {
+            // Done only once at creation of the project
             createTypeForExtendedCustomLineItem(client);
 
+            final Cart cart = createCart(client);
             final ProductProjection product = getSomeProduct(client);
-            final Cart cart = getSomeCartWithThisProduct(client, product);
-            final LineItem lineItemInCart = getLineItemInCart(cart);
 
-            final Cart updatedCart = addExtendedCustomLineItemWithProductInfoAndPriceFromSap(client, product, cart, lineItemInCart);
-            System.err.println(updatedCart);
+            final int quantity = 3;
+            final Cart cartWithProductAndPrice = addLineItemWithPriceFromSap(client, product, cart, quantity);
+            System.err.println(cartWithProductAndPrice);
         }
     }
 
-    private static Cart addExtendedCustomLineItemWithProductInfoAndPriceFromSap(final SphereClient client, final ProductProjection product, final Cart cart, final LineItem lineItemInCart) {
-        final CustomLineItemDraft customLineItemDraft = CustomLineItemDraft.of(product.getName(), "product-sap", getFinalPriceFromSap(), product.getTaxCategory(), lineItemInCart.getQuantity());
-        final List<UpdateAction<Cart>> updateActions = asList(AddCustomLineItem.of(customLineItemDraft), RemoveLineItem.of(lineItemInCart));
-        final Cart cartWithCustomLineItem = execute(client, CartUpdateCommand.of(cart, updateActions));
+    private static Cart addLineItemWithPriceFromSap(final SphereClient client, final ProductProjection product,
+                                                    final Cart cart, final int quantity) {
+        final Cart cartWithLineItem = addProductToCart(client, cart, product, quantity);
+        final Cart cartWithCustomLineItem = replaceLineItemWithCustomLineItem(client, product, cartWithLineItem);
+        return addProductInfoFieldsInCustomLineItem(client, product, cartWithCustomLineItem);
+    }
 
+    private static Cart addProductInfoFieldsInCustomLineItem(final SphereClient client, final ProductProjection product, final Cart cartWithCustomLineItem) {
         final Map<String, Object> values = new HashMap<>();
         values.put(PRODUCT_ID_FIELD, product.getId());
         values.put(PRODUCT_SLUG_FIELD, product.getSlug());
@@ -73,6 +77,21 @@ public class Main {
         final SetCustomLineItemCustomType setCustomLineItemCustomType = SetCustomLineItemCustomType
                 .ofTypeKeyAndObjects(CUSTOM_TYPE_KEY, values, getCustomLineItemInCart(cartWithCustomLineItem));
         return execute(client, CartUpdateCommand.of(cartWithCustomLineItem, setCustomLineItemCustomType));
+    }
+
+    private static Cart replaceLineItemWithCustomLineItem(final SphereClient client, final ProductProjection product, final Cart cart) {
+        final LineItem lineItemInCart = getLineItemInCart(cart);
+        final CustomLineItemDraft customLineItemDraft = CustomLineItemDraft.of(product.getName(), "product-sap", getFinalPriceFromSap(), product.getTaxCategory(), lineItemInCart.getQuantity());
+        final List<UpdateAction<Cart>> updateActions = asList(AddCustomLineItem.of(customLineItemDraft), RemoveLineItem.of(lineItemInCart));
+        return execute(client, CartUpdateCommand.of(cart, updateActions));
+    }
+
+    private static Cart addProductToCart(final SphereClient client, final Cart cart, final ProductProjection product, final int quantity) {
+        return execute(client, CartUpdateCommand.of(cart, AddLineItem.of(product, product.getMasterVariant().getId(), quantity)));
+    }
+
+    private static Cart createCart(final SphereClient client) {
+        return execute(client, CartCreateCommand.of(CartDraft.of(DefaultCurrencyUnits.EUR)));
     }
 
     private static Type createTypeForExtendedCustomLineItem(final SphereClient client) {
@@ -98,12 +117,6 @@ public class Main {
 
     private static LineItem getLineItemInCart(final Cart cart) {
         return cart.getLineItems().get(0);
-    }
-
-    private static Cart getSomeCartWithThisProduct(final SphereClient client, final ProductProjection product) {
-        final Cart cart = execute(client, CartCreateCommand.of(CartDraft.of(DefaultCurrencyUnits.EUR)));
-        final int quantity = 2;
-        return execute(client, CartUpdateCommand.of(cart, AddLineItem.of(product, product.getMasterVariant().getId(), quantity)));
     }
 
     private static Money getFinalPriceFromSap() {
