@@ -1,31 +1,42 @@
 package handson;
 
+import com.neovisionaries.i18n.CountryCode;
 import io.sphere.sdk.carts.*;
 import io.sphere.sdk.carts.commands.CartCreateCommand;
 import io.sphere.sdk.carts.commands.CartDeleteCommand;
 import io.sphere.sdk.carts.commands.CartUpdateCommand;
-import io.sphere.sdk.carts.commands.updateactions.AddCustomLineItem;
 import io.sphere.sdk.carts.commands.updateactions.AddLineItem;
-import io.sphere.sdk.carts.commands.updateactions.RemoveCustomLineItem;
-import io.sphere.sdk.carts.commands.updateactions.RemoveLineItem;
+import io.sphere.sdk.carts.commands.updateactions.SetShippingAddress;
 import io.sphere.sdk.carts.queries.CartByIdGet;
-import io.sphere.sdk.carts.queries.CartQuery;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.client.SphereClientConfig;
 import io.sphere.sdk.client.SphereClientFactory;
 import io.sphere.sdk.client.SphereRequest;
-import io.sphere.sdk.commands.UpdateAction;
+import io.sphere.sdk.models.Address;
 import io.sphere.sdk.models.LocalizedString;
-import io.sphere.sdk.products.ProductProjection;
-import io.sphere.sdk.products.ProductVariant;
-import io.sphere.sdk.products.queries.ProductProjectionByIdGet;
-import io.sphere.sdk.products.queries.ProductProjectionQuery;
-import io.sphere.sdk.queries.QueryPredicate;
+import io.sphere.sdk.orders.Order;
+import io.sphere.sdk.orders.commands.OrderDeleteCommand;
+import io.sphere.sdk.orders.commands.OrderFromCartCreateCommand;
+import io.sphere.sdk.orders.commands.OrderUpdateCommand;
+import io.sphere.sdk.orders.commands.updateactions.SetCustomField;
+import io.sphere.sdk.orders.commands.updateactions.SetCustomType;
+import io.sphere.sdk.products.*;
+import io.sphere.sdk.products.attributes.AttributeDefinitionBuilder;
+import io.sphere.sdk.products.attributes.StringType;
+import io.sphere.sdk.products.attributes.BooleanType;
+import io.sphere.sdk.products.commands.ProductCreateCommand;
+import io.sphere.sdk.products.commands.ProductDeleteCommand;
+import io.sphere.sdk.producttypes.ProductType;
+import io.sphere.sdk.producttypes.ProductTypeDraft;
+import io.sphere.sdk.producttypes.commands.ProductTypeCreateCommand;
+import io.sphere.sdk.producttypes.commands.ProductTypeDeleteCommand;
+import io.sphere.sdk.taxcategories.TaxCategory;
+import io.sphere.sdk.taxcategories.queries.TaxCategoryQuery;
 import io.sphere.sdk.types.*;
 import io.sphere.sdk.types.commands.TypeCreateCommand;
 import io.sphere.sdk.types.commands.TypeDeleteCommand;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.javamoney.moneta.Money;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -33,19 +44,15 @@ import java.util.*;
 
 import static io.sphere.sdk.models.DefaultCurrencyUnits.EUR;
 import static io.sphere.sdk.models.TextInputHint.*;
-import static io.sphere.sdk.products.ProductProjectionType.CURRENT;
 import static io.sphere.sdk.utils.SetUtils.asSet;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Locale.ENGLISH;
 
 public class Main {
-    public static final String CUSTOM_LINE_ITEM_TYPE_KEY = RandomStringUtils.randomAlphanumeric(10);
-    public static final String CART_TYPE_KEY = RandomStringUtils.randomAlphanumeric(10);
-    public static final String PRODUCT_ID_FIELD = "productId";
-    public static final String PRODUCT_SLUG_FIELD = "productSlug";
-    public static final String PRODUCT_SKU_FIELD = "productSku";
-    public static final String CUSTOMER_NUMBER_FIELD = "customerNumber";
+    public static final String PRODUCT_TYPE_KEY = RandomStringUtils.randomAlphanumeric(10);
+    public static final String ORDER_WITH_FRAUD_SCORE_TYPE_KEY = RandomStringUtils.randomAlphanumeric(10);
+    public static final String FRAUD_SCORE_FIELD = "fraudScore";
 
     public static void main(String[] args) throws IOException {
         final Properties prop = loadCommercetoolsPlatformProperties();
@@ -55,175 +62,102 @@ public class Main {
         final SphereClientConfig clientConfig = SphereClientConfig.of(projectKey, clientId, clientSecret);
 
         try(final SphereClient client = SphereClientFactory.of().createClient(clientConfig)) {
-            // Done only once at creation of the project
-            final Type typeForCustomLineItems = createTypeForExtendedCustomLineItems(client);
-            System.err.println("Created typeForCustomLineItems for extending custom line items with product information:");
-            System.err.println(typeForCustomLineItems);
+            final TaxCategory taxCategory = execute(client, TaxCategoryQuery.of()).head()
+                    .orElseThrow(() -> new RuntimeException("Missing a tax category"));
+            // Done only once at the creation of the project (usually on import process)
+            final ProductType productType = createProductType(client);
+            final Product shirt = createProduct(client, productType, taxCategory, "shirt");
+            final Product pants = createProduct(client, productType, taxCategory, "pants");
 
-            // Done only once at creation of the project
+            // Done only once at creation of the project (usually on import process)
             final Type typeForCarts = createTypeForExtendedCarts(client);
-            System.err.println("Created typeForCart for extending carts with customer number:");
+            System.err.println("Created typeForCart for extending carts with fraud score");
             System.err.println(typeForCarts);
 
             // We create a cart at some moment, e.g. when the customer logs in
-            final String customerNumber = "34563463456";
-            final Cart cart = createCart(client, customerNumber);
-            printCart(cart, "Empty cart created:");
+            final Cart cart = createCart(client);
+            printCart(cart, "Empty cart created");
 
             final String sessionCartId = cart.getId();
 
             // Many pages are clicked...
 
             // First we fetch our cart from the session
-            final Cart cartFetchedFromSession = execute(client, CartByIdGet.of(sessionCartId));
+            final Cart cartFetchedFromSession = fetchCartById(client, sessionCartId);
 
             // When clicked on "add to cart" we add a product to the cart, which contains a non-customized price
             final int quantity = 3;
-            final ProductProjection product = getSomeProduct(client);
-            final ProductVariant variant = product.getMasterVariant(); // TODO find variant requested
-            final Cart cartWithLineItem = addProductToCart(client, cartFetchedFromSession, product, variant, quantity);
-            printCart(cartWithLineItem, "Cart with regular line items:");
+            final String productId = shirt.getId(); // Data coming from the request
+            final Integer variantId = shirt.getMasterData().getStaged().getMasterVariant().getId(); // Data coming from the request
+            final Cart cartWithLineItem = addProductToCart(client, cartFetchedFromSession, productId, variantId, quantity);
+            printCart(cartWithLineItem, "Added product to cart");
 
-            // When clicked on "refresh price" we replace the line items with custom line items, which contain the price from the external system
-            final Cart cartWithProductAndPrice = updateCartWithCustomPrices(client, cartWithLineItem);
-            printCart(cartWithProductAndPrice, "Cart with custom line items with customized price:");
+            // On shipping selection, introduced at least a country for shipping
+            final CountryCode country = CountryCode.DE;
+            final Cart cartWithShippingAddress = setShippingAddress(client, cartWithLineItem, country);
 
-            // When after having refreshed the price the customer decides to add more units
-            final int additionalQuantity = 2;
-            final Cart cartWithMoreProductsAndPrices = addProductToCartWithCustomizedPrice(client, cartWithProductAndPrice, product, variant, additionalQuantity);
-            printCart(cartWithMoreProductsAndPrices, "Cart with 2 additional units with the same product and customized price");
+            // When it is confirmed and paid, we create the order
+            final Order order = createOrderFromCart(client, cartWithShippingAddress);
+            printCart(order, "Created order");
 
-            // When after having refreshed the price the customer decides to add more products
-            final int anotherQuantity = 2;
-            final ProductProjection someOtherProduct = getSomeOtherProduct(client);
-            final ProductVariant someOtherVariant = someOtherProduct.getMasterVariant(); // TODO find variant requested
-            final Cart finalCart = addProductToCartWithCustomizedPrice(client, cartWithMoreProductsAndPrices, someOtherProduct, someOtherVariant, anotherQuantity);
-            printCart(finalCart, "Cart with an additional custom line item with another product and customized price");
-
-            // On "Orders history" page, list carts with this customer number
-            printCartsByCustomerNumber(client, customerNumber);
+            // On the other hand, the microservice listens to an order created message...
+            final double fraudScore = 7; // Data coming from the fraud detection external system
+            final Order orderWithFraudScore = setFraudScore(client, order, fraudScore);
+            printCart(orderWithFraudScore, "Updated order with fraud score");
 
             // Clean up project to avoid conflicts for next iteration
-            cleanUpProject(client, finalCart, typeForCustomLineItems, typeForCarts);
+            cleanUpProject(client, productType, asList(shirt, pants), orderWithFraudScore, typeForCarts);
         }
     }
 
-    private static void printCartsByCustomerNumber(final SphereClient client, final String customerNumber) {
-        System.err.println("");
-        System.err.println("List of carts with customer number " + customerNumber);
-
-        final QueryPredicate<Cart> queryPredicate = QueryPredicate.of(String.format("custom(fields(customerNumber = \"%s\"))", customerNumber));
-        execute(client, CartQuery.of().withPredicates(queryPredicate)).getResults().forEach(System.err::println);
+    private static Order setFraudScore(final SphereClient client, final Order order, final double fraudScore) {
+        final Map<String, Object> values = new HashMap<>();
+        values.put(FRAUD_SCORE_FIELD, fraudScore);
+        final SetCustomType setCustomType = SetCustomType.ofTypeKeyAndObjects(ORDER_WITH_FRAUD_SCORE_TYPE_KEY, values);
+        return execute(client, OrderUpdateCommand.of(order, setCustomType));
     }
 
-    private static void printCart(final Cart cart, final String message) {
+    private static void printCart(final CartLike<?> cartLike, final String message) {
         System.err.println("");
-        System.err.println(message);
-        System.err.println("Customer number: " + cart.getCustom().getFieldAsString(CUSTOMER_NUMBER_FIELD));
+        System.err.println(message + ":");
         System.err.println("Line items:");
-        cart.getLineItems().forEach(System.err::println);
-        System.err.println("Custom line items:");
-        cart.getCustomLineItems().forEach(System.err::println);
-    }
-
-    private static Cart updateCartWithCustomPrices(final SphereClient client, final Cart cart) {
-        final List<UpdateAction<Cart>> replaceLineItemsUpdateActions = new ArrayList<>();
-        for (final LineItem lineItem : cart.getLineItems()) {
-            final ProductProjection product = getProductFromLineItem(client, lineItem);
-            final ProductVariant variant = product.findVariantBySky(lineItem.getVariant().getSku()).get();
-            replaceLineItemsUpdateActions.addAll(actionToReplaceLineItemWithCustomLineItem(product, variant, lineItem));
-        }
-        return execute(client, CartUpdateCommand.of(cart, replaceLineItemsUpdateActions));
-    }
-
-    private static List<UpdateAction<Cart>> actionToReplaceLineItemWithCustomLineItem(final ProductProjection product,
-                                                                                      final ProductVariant variant,
-                                                                                      final LineItem lineItem) {
-        return asList(RemoveLineItem.of(lineItem), actionToCreateCustomLineItem(product, variant, lineItem.getQuantity()));
-    }
-
-    private static UpdateAction<Cart> actionToCreateCustomLineItem(final ProductProjection product, final ProductVariant variant, final long quantity) {
-        final CustomLineItemDraft customLineItemDraft = createCustomLineItemFromProduct(product, variant, quantity);
-        final CustomFieldsDraft customFieldsDraft = CustomFieldsDraft.ofTypeKeyAndObjects(CUSTOM_LINE_ITEM_TYPE_KEY, extractInfoFromProduct(product));
-        return AddCustomLineItem.of(customLineItemDraft).withCustom(customFieldsDraft);
-    }
-
-    private static Map<String, Object> extractInfoFromProduct(final ProductProjection product) {
-        final Map<String, Object> productInfo = new HashMap<>();
-        productInfo.put(PRODUCT_ID_FIELD, product.getId());
-        productInfo.put(PRODUCT_SLUG_FIELD, product.getSlug());
-        productInfo.put(PRODUCT_SKU_FIELD, product.getMasterVariant().getSku());
-        return productInfo;
-    }
-
-    private static CustomLineItemDraft createCustomLineItemFromProduct(final ProductProjection product, final ProductVariant variant, final long quantity) {
-        return CustomLineItemDraft.of(product.getName(), variant.getSku(), getFinalPriceFromExternalSystem(), product.getTaxCategory(), quantity);
-    }
-
-    private static Cart addProductToCart(final SphereClient client, final Cart cart, final ProductProjection product,
-                                         final ProductVariant variant, final int quantity) {
-        return execute(client, CartUpdateCommand.of(cart, AddLineItem.of(product, variant.getId(), quantity)));
-    }
-
-    private static Cart addProductToCartWithCustomizedPrice(final SphereClient client, final Cart cart, final ProductProjection product,
-                                                            final ProductVariant variant, final int quantity) {
-        final Optional<CustomLineItem> customLineItemForProduct = findCustomLineItemForProduct(cart, variant.getSku());
-        if (customLineItemForProduct.isPresent()) {
-            final long newQuantity = quantity + customLineItemForProduct.get().getQuantity();
-            final UpdateAction<Cart> addToCartAction = actionToCreateCustomLineItem(product, variant, newQuantity);
-            return execute(client, CartUpdateCommand.of(cart, asList(RemoveCustomLineItem.of(customLineItemForProduct.get()), addToCartAction)));
-        } else {
-            return execute(client, CartUpdateCommand.of(cart, actionToCreateCustomLineItem(product, variant, quantity)));
+        cartLike.getLineItems().forEach(System.err::println);
+        if (cartLike.getCustom() != null) {
+            Optional.ofNullable(cartLike.getCustom().getFieldAsLong(FRAUD_SCORE_FIELD))
+                    .ifPresent(fraudScore -> System.err.println("Fraud score: " + fraudScore));
         }
     }
 
-    private static Optional<CustomLineItem> findCustomLineItemForProduct(final Cart cart, final String sku) {
-        return cart.getCustomLineItems().stream()
-                .filter(cli -> cli.getSlug().equals(sku))
-                .findFirst();
+    private static Cart createCart(final SphereClient client) {
+        return execute(client, CartCreateCommand.of(CartDraft.of(EUR)));
+    }
+
+    private static Cart fetchCartById(final SphereClient client, final String cartId) {
+        return execute(client, CartByIdGet.of(cartId));
+    }
+
+    private static Cart addProductToCart(final SphereClient client, final Cart cart, final String productId,
+                                         final int variantId, final int quantity) {
+        return execute(client, CartUpdateCommand.of(cart, AddLineItem.of(productId, variantId, quantity)));
+    }
+
+    private static Cart setShippingAddress(final SphereClient client, final Cart cart, final CountryCode country) {
+        final Address address = Address.of(country);
+        return execute(client, CartUpdateCommand.of(cart, SetShippingAddress.of(address)));
+    }
+
+    private static Order createOrderFromCart(final SphereClient client, final Cart cart) {
+        return execute(client, OrderFromCartCreateCommand.of(cart));
     }
 
     private static Type createTypeForExtendedCarts(final SphereClient client) {
-        // This is only executed (or created) once, this doesn't need to be here in a real example
-        final TypeDraft typeDraft = TypeDraftBuilder.of(CART_TYPE_KEY, LocalizedString.of(ENGLISH, "Cart with customer number"), asSet("order"))
+        // The type is only created once per project, i.e. this doesn't need to be here in a real example
+        final LocalizedString cartTypeName = LocalizedString.of(ENGLISH, "Cart with fraud score");
+        final TypeDraft typeDraft = TypeDraftBuilder.of(ORDER_WITH_FRAUD_SCORE_TYPE_KEY, cartTypeName, asSet("order"))
                 .fieldDefinitions(singletonList(
-                        FieldDefinition.of(StringType.of(), CUSTOMER_NUMBER_FIELD, LocalizedString.of(ENGLISH, "Customer number"), false, SINGLE_LINE)
+                        FieldDefinition.of(io.sphere.sdk.types.NumberType.of(), FRAUD_SCORE_FIELD, LocalizedString.of(ENGLISH, "Fraud score"), false, SINGLE_LINE)
                 )).build();
         return execute(client, TypeCreateCommand.of(typeDraft));
-    }
-
-    private static Type createTypeForExtendedCustomLineItems(final SphereClient client) {
-        // This is only executed (or created) once, this doesn't need to be here in a real example
-        final TypeDraft typeDraft = TypeDraftBuilder.of(CUSTOM_LINE_ITEM_TYPE_KEY, LocalizedString.of(ENGLISH, "CustomLineItem with product"), asSet("custom-line-item"))
-                .fieldDefinitions(asList(
-                        FieldDefinition.of(StringType.of(), PRODUCT_ID_FIELD, LocalizedString.of(ENGLISH, "Product ID"), true, SINGLE_LINE),
-                        FieldDefinition.of(LocalizedStringType.of(), PRODUCT_SLUG_FIELD, LocalizedString.of(ENGLISH, "Product Slug"), true, SINGLE_LINE),
-                        FieldDefinition.of(StringType.of(), PRODUCT_SKU_FIELD, LocalizedString.of(ENGLISH, "SKU"), true, SINGLE_LINE)))
-                .build();
-        return execute(client, TypeCreateCommand.of(typeDraft));
-    }
-
-    private static ProductProjection getProductFromLineItem(final SphereClient client, final LineItem lineItem) {
-        return execute(client, ProductProjectionByIdGet.of(lineItem.getProductId(), CURRENT));
-    }
-
-    private static Cart createCart(final SphereClient client, final String customerNumber) {
-        final CustomFieldsDraft customFieldsDraft = CustomFieldsDraftBuilder.ofTypeKey(CART_TYPE_KEY)
-                .addObject(CUSTOMER_NUMBER_FIELD, customerNumber)
-                .build();
-        return execute(client, CartCreateCommand.of(CartDraft.of(EUR).withCustom(customFieldsDraft)));
-    }
-
-    private static Money getFinalPriceFromExternalSystem() {
-        return Money.of(BigDecimal.TEN, EUR); // TODO fetch price from external system
-    }
-
-    private static ProductProjection getSomeProduct(final SphereClient client) {
-        return execute(client, ProductProjectionQuery.ofCurrent()).getResults().get(0);
-    }
-
-    private static ProductProjection getSomeOtherProduct(final SphereClient client) {
-        return execute(client, ProductProjectionQuery.ofCurrent()).getResults().get(1);
     }
 
     private static Properties loadCommercetoolsPlatformProperties() throws IOException {
@@ -232,11 +166,36 @@ public class Main {
         return prop;
     }
 
-    private static void cleanUpProject(final SphereClient client, final Cart cartWithProductAndPrice,
-                                       final Type typeForCustomLineItems, final Type typeForCarts) {
-        execute(client, CartDeleteCommand.of(cartWithProductAndPrice));
-        execute(client, TypeDeleteCommand.of(typeForCustomLineItems));
+    private static Product createProduct(final SphereClient client, final ProductType productType,
+                                         final TaxCategory taxCategory, final String name) {
+        final LocalizedString localizedName = LocalizedString.of(ENGLISH, name);
+        final LocalizedString randomSlug = LocalizedString.of(ENGLISH, RandomStringUtils.randomAlphanumeric(10));
+        final ProductVariantDraft masterVariant = ProductVariantDraftBuilder.of()
+                .price(PriceDraft.of(BigDecimal.valueOf(RandomUtils.nextLong(1, 50)), EUR))
+                .build();
+        final ProductDraft draft = ProductDraftBuilder.of(productType, localizedName, randomSlug, masterVariant)
+                .taxCategory(taxCategory)
+                .build();
+        return execute(client, ProductCreateCommand.of(draft));
+    }
+
+    private static ProductType createProductType(final SphereClient client) {
+        final ProductTypeDraft draft = ProductTypeDraft.of(PRODUCT_TYPE_KEY, PRODUCT_TYPE_KEY, "", asList(
+                AttributeDefinitionBuilder.of("color", LocalizedString.of(ENGLISH, "Color"), StringType.of()).build(),
+                AttributeDefinitionBuilder.of("handmade", LocalizedString.of(ENGLISH, "Handmade"), BooleanType.of()).build()));
+        return execute(client, ProductTypeCreateCommand.of(draft));
+    }
+
+    private static void cleanUpProject(final SphereClient client, final ProductType productType, final List<Product> products,
+                                       final Order order, final Type typeForCarts) {
+        execute(client, OrderDeleteCommand.of(order));
+        if (order.getCart() != null) {
+            final Cart cart = execute(client, CartByIdGet.of(order.getCart().getId()));
+            execute(client, CartDeleteCommand.of(cart));
+        }
         execute(client, TypeDeleteCommand.of(typeForCarts));
+        products.forEach(p -> execute(client, ProductDeleteCommand.of(p)));
+        execute(client, ProductTypeDeleteCommand.of(productType));
     }
 
     private static <T> T execute(final SphereClient client, final SphereRequest<T> sphereRequest) {
