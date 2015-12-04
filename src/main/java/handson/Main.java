@@ -18,7 +18,6 @@ import io.sphere.sdk.orders.Order;
 import io.sphere.sdk.orders.commands.OrderDeleteCommand;
 import io.sphere.sdk.orders.commands.OrderFromCartCreateCommand;
 import io.sphere.sdk.orders.commands.OrderUpdateCommand;
-import io.sphere.sdk.orders.commands.updateactions.SetCustomField;
 import io.sphere.sdk.orders.commands.updateactions.SetCustomType;
 import io.sphere.sdk.products.*;
 import io.sphere.sdk.products.attributes.AttributeDefinitionBuilder;
@@ -62,8 +61,30 @@ public class Main {
         final SphereClientConfig clientConfig = SphereClientConfig.of(projectKey, clientId, clientSecret);
 
         try(final SphereClient client = SphereClientFactory.of().createClient(clientConfig)) {
+
+            /**
+             * TASKS:
+             *
+             * - Add attribute values for the products:
+             *      - Modify "createProduct" method to pass `String color` and `boolean handmade`
+             *      - Add these values to the master variant draft
+             *
+             * - Search products, by the following criteria:
+             *      - Sort them by attribute color ascending
+             *      - Additionally sort them by price descending (multi sorting)
+             *      - Try using fulltext search and search for a value
+             *
+             * - Display information from master variant products (remember: staged versions!):
+             *      - Display SKU
+             *      - Display price
+             *      - Display attribute "color" (string) and "handmade" (boolean)
+             */
+
+
+            // Fetch first tax category we find for simplicity
             final TaxCategory taxCategory = execute(client, TaxCategoryQuery.of()).head()
                     .orElseThrow(() -> new RuntimeException("Missing a tax category"));
+
             // Done only once at the creation of the project (usually on import process)
             final ProductType productType = createProductType(client);
             final Product shirt = createProduct(client, productType, taxCategory, "shirt");
