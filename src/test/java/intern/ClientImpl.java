@@ -28,7 +28,7 @@ final class ClientImpl implements Client {
             return execute(sphereRequest).toCompletableFuture().get(5, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             final Throwable cause =
-                    e.getCause() != null && e.getCause() instanceof ExecutionException
+                    e.getCause() != null && e instanceof ExecutionException
                     ? e.getCause()
                     : e;
             throw new CompletionException(cause);
