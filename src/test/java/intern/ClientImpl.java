@@ -25,13 +25,13 @@ final class ClientImpl implements Client {
     @Override
     public <T> T complete(final SphereRequest<T> sphereRequest) {
         try {
-            return execute(sphereRequest).toCompletableFuture().get(5, TimeUnit.SECONDS);
+            return execute(sphereRequest).toCompletableFuture().get(10, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             final Throwable cause =
                     e.getCause() != null && e instanceof ExecutionException
-                    ? e.getCause()
-                    : e;
-            throw new CompletionException(cause);
+                            ? e.getCause()
+                            : e;
+            throw cause instanceof RuntimeException? (RuntimeException) cause : new CompletionException(cause);
         }
     }
 }
