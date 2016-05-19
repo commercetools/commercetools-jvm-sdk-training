@@ -11,8 +11,8 @@
 ## Links
 
 1. http://dev.commercetools.com/http-api-types.html
-1. http://sphereio.github.io/sphere-jvm-sdk/javadoc/master/io/sphere/sdk/models/LocalizedString.html
-1. http://sphereio.github.io/sphere-jvm-sdk/javadoc/master/io/sphere/sdk/models/Reference.html
-1. http://sphereio.github.io/sphere-jvm-sdk/javadoc/master/io/sphere/sdk/meta/FormattingDocumentation.html
+1. http://commercetools.github.io/commercetools-jvm-sdk/javadoc/master/io/sphere/sdk/models/LocalizedString.html
+1. http://commercetools.github.io/commercetools-jvm-sdk/javadoc/master/io/sphere/sdk/models/Reference.html
+1. http://commercetools.github.io/commercetools-jvm-sdk/javadoc/master/io/sphere/sdk/meta/FormattingDocumentation.html
 1. https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html
-1. http://sphereio.github.io/sphere-jvm-sdk/javadoc/master/io/sphere/sdk/meta/ConstructionDocumentation.html
+1. http://commercetools.github.io/commercetools-jvm-sdk/javadoc/master/io/sphere/sdk/meta/ConstructionDocumentation.html

@@ -11,7 +11,7 @@
 
 
 ## Links
-* http://sphereio.github.io/sphere-jvm-sdk/javadoc/master/io/sphere/sdk/meta/GettingStarted.html
-* http://sphereio.github.io/sphere-jvm-sdk/javadoc/master/io/sphere/sdk/meta/SphereResources.html
-* http://sphereio.github.io/sphere-jvm-sdk/javadoc/master/io/sphere/sdk/meta/AsyncDocumentation.html
-* http://sphereio.github.io/sphere-jvm-sdk/javadoc/master/io/sphere/sdk/meta/SphereClientTuningDocumentation.html
+* http://commercetools.github.io/commercetools-jvm-sdk/javadoc/master/io/sphere/sdk/meta/GettingStarted.html
+* http://commercetools.github.io/commercetools-jvm-sdk/javadoc/master/io/sphere/sdk/meta/SphereResources.html
+* http://commercetools.github.io/commercetools-jvm-sdk/javadoc/master/io/sphere/sdk/meta/AsyncDocumentation.html
+* http://commercetools.github.io/commercetools-jvm-sdk/javadoc/master/io/sphere/sdk/meta/SphereClientTuningDocumentation.html

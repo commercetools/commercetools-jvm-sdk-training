@@ -5,4 +5,4 @@
 * use reference expansion
 
 ## links
-* http://sphereio.github.io/sphere-jvm-sdk/javadoc/master/io/sphere/sdk/meta/QueryDocumentation.html
+* http://commercetools.github.io/commercetools-jvm-sdk/javadoc/master/io/sphere/sdk/meta/QueryDocumentation.html

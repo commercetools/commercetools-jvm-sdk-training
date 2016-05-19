@@ -6,4 +6,4 @@
 
 ## Links
 
-1. http://sphereio.github.io/sphere-jvm-sdk/javadoc/master/io/sphere/sdk/categories/commands/CategoryCreateCommand.html
+1. http://commercetools.github.io/commercetools-jvm-sdk/javadoc/master/io/sphere/sdk/categories/commands/CategoryCreateCommand.html
