@@ -3,8 +3,8 @@ package crud.lecture1_create;
 import intern.BaseTest;
 import io.sphere.sdk.products.attributes.AttributeConstraint;
 import io.sphere.sdk.products.attributes.AttributeDefinition;
-import io.sphere.sdk.products.attributes.MoneyType;
-import io.sphere.sdk.products.attributes.StringType;
+import io.sphere.sdk.products.attributes.MoneyAttributeType;
+import io.sphere.sdk.products.attributes.StringAttributeType;
 import io.sphere.sdk.producttypes.ProductType;
 import io.sphere.sdk.producttypes.commands.ProductTypeCreateCommand;
 import io.sphere.sdk.producttypes.commands.ProductTypeDeleteCommand;
@@ -41,13 +41,13 @@ public class CreateTest extends BaseTest {
         final ProductType productType = ct().complete(createCommand);
         assertThat(productType.getKey()).isEqualTo("boiler");
         final AttributeDefinition shorttextAttributeDefinition = productType.getAttribute("shorttext");
-        assertThat(shorttextAttributeDefinition.getAttributeType()).isInstanceOf(StringType.class);
+        assertThat(shorttextAttributeDefinition.getAttributeType()).isInstanceOf(StringAttributeType.class);
         assertThat(shorttextAttributeDefinition.getAttributeConstraint()).isEqualTo(AttributeConstraint.NONE);
-        assertThat(shorttextAttributeDefinition.getIsRequired()).isTrue();
+        assertThat(shorttextAttributeDefinition.isRequired()).isTrue();
         final AttributeDefinition srpPriceAttributeDefinition = productType.getAttribute("srpprice");
-        assertThat(srpPriceAttributeDefinition.getAttributeType()).isInstanceOf(MoneyType.class);
+        assertThat(srpPriceAttributeDefinition.getAttributeType()).isInstanceOf(MoneyAttributeType.class);
         assertThat(srpPriceAttributeDefinition.getAttributeConstraint()).isEqualTo(AttributeConstraint.NONE);
-        assertThat(srpPriceAttributeDefinition.getIsRequired()).isFalse();
+        assertThat(srpPriceAttributeDefinition.isRequired()).isFalse();
     }
 
     @Before
