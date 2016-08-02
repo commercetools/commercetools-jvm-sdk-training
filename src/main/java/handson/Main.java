@@ -4,7 +4,9 @@ import io.sphere.sdk.client.BlockingSphereClient;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.client.SphereClientConfig;
 import io.sphere.sdk.client.SphereClientFactory;
+import io.sphere.sdk.products.ProductProjection;
 import io.sphere.sdk.products.queries.ProductProjectionQuery;
+import io.sphere.sdk.queries.PagedQueryResult;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -12,8 +14,10 @@ import java.util.Properties;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        try(final SphereClient client = createSphereClient()) {
-            System.err.println(client.execute(ProductProjectionQuery.ofCurrent()).toCompletableFuture().join());
+        try(final BlockingSphereClient client = createSphereClient()) {
+            final ProductProjectionQuery sphereRequest = ProductProjectionQuery.ofCurrent();
+            final PagedQueryResult<ProductProjection> queryResult = client.executeBlocking(sphereRequest);
+            System.err.println(queryResult);
         }
     }
 
