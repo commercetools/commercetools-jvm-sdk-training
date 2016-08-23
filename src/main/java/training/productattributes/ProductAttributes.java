@@ -1,23 +1,18 @@
 package training.productattributes;
 
-import common.IO;
 import io.sphere.sdk.client.BlockingSphereClient;
-import io.sphere.sdk.client.SphereClientUtils;
 import io.sphere.sdk.products.ProductProjection;
 import io.sphere.sdk.products.queries.ProductProjectionQuery;
 import io.sphere.sdk.producttypes.ProductType;
 import io.sphere.sdk.producttypes.queries.ProductTypeQuery;
-import io.sphere.sdk.queries.QueryExecutionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.validation.DefaultMessageCodesResolver;
 import sun.plugin.dom.exception.InvalidStateException;
 
-import java.text.Format;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
