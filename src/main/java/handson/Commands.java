@@ -83,13 +83,11 @@ public class Commands {
     /**
      * Queries the first product type, if none available it creates one
      * @param client CTP client
-     * @return Queried or created prodyct type
+     * @return Queried or created product type
      */
     public static ProductType queryFirstProductType(final BlockingSphereClient client) {
-        ProductTypeQuery request = ProductTypeQuery.of();
-        return client.executeBlocking(request)
-                .head()
-                .orElseGet(() -> createProductType(client));
+        //TODO 3.2. Query/create a proeduct type
+        return null;
     }
 
     /**
@@ -113,21 +111,14 @@ public class Commands {
      */
     public static Product createProduct(final BlockingSphereClient client, final ProductType productType,
                                         final String name, final String key, final String sku) {
-        final LocalizedString localizedName = LocalizedString.of(ENGLISH, name);
-        final LocalizedString randomSlug = LocalizedString.of(ENGLISH, RandomStringUtils.randomAlphanumeric(10));
+        //TODO 3.3.1. Define name and slug for the product
 
-        final ProductVariantDraft masterVariant = ProductVariantDraftBuilder.of()
-                .price(PriceDraft.of(BigDecimal.valueOf(RandomUtils.nextLong(300, 1000)), EUR))
-                .sku(sku)
-                .build();
+        //TODO 3.3.2. Create a master variant
 
-        final ProductDraft draft = ProductDraftBuilder.of(productType, localizedName, randomSlug, masterVariant)
-                .key(key)
-                .build();
+        //TODO 3.3.3. Create a product draft
 
-        final ProductCreateCommand createCommand = ProductCreateCommand.of(draft);
-
-        return client.executeBlocking(createCommand);
+        //TODO 3.3.4. Create creation command and execute it
+        return null;
     }
 
     /**
@@ -183,8 +174,8 @@ public class Commands {
                                                                  final String key,
                                                                  final Long version,
                                                                  final TaxCategory taxCategory){
-        final ProductUpdateCommand updateCommand = ProductUpdateCommand.ofKey(key, version, SetTaxCategory.of(taxCategory));
-        return client.executeBlocking(updateCommand);
+       //TODO 3.5.3. Create an product update command and execute it
+        return null;
     }
 
     /**
@@ -220,10 +211,8 @@ public class Commands {
      * @return the queried or created tax category
      */
     public static TaxCategory queryFirstTaxCategory(final BlockingSphereClient client){
-        TaxCategoryQuery request = TaxCategoryQuery.of();
-        return client.executeBlocking(request)
-                .head()
-                .orElseGet(() -> createTaxCategory(client, "Default Tax", 0.1));
+        //TODO 3.5.1 Query or create a tax category
+        return null;
     }
 
     /**
@@ -289,11 +278,8 @@ public class Commands {
      * @return Returns queried or created cart
      */
     public static Cart queryFirstCart(final BlockingSphereClient client){
-        String currencyCode = "EUR";
-        CartQuery request = CartQuery.of();
-        return client.executeBlocking(request)
-                .head()
-                .orElseGet(() -> createCart(client, currencyCode)); // Lambda supplier
+        //TODO 3.6.1. Query/create a cart
+        return null;
     }
 
     /**
@@ -334,11 +320,8 @@ public class Commands {
      * @return The cart after adding the product
      */
     public static Cart addProductToCart(final BlockingSphereClient client, final String productId, final Cart cart, final Long quantity){
-        final int MASTER_VARIANT_ID = 1;
-        final AddLineItem action = AddLineItem.of(productId, MASTER_VARIANT_ID, quantity);
-        final CartUpdateCommand command = CartUpdateCommand.of(cart, action);
-
-        return client.executeBlocking(command);
+        //TODO 3.7. Add product to a cart
+        return null;
     }
 
     /**
@@ -349,10 +332,8 @@ public class Commands {
      * @return The cart after adding the shipping address
      */
     public static Cart setShippingAddress(final BlockingSphereClient client, final Address address, final Cart cart){
-        UpdateAction<Cart> action = SetShippingAddress.of(address);
-        CartUpdateCommand command = CartUpdateCommand.of(cart, action);
-
-        return client.executeBlocking(command);
+        //TODO 3.8. Create an cart update action to set shipping address, create a command from it, then execute it
+        return null;
     }
 
     /**
@@ -362,8 +343,8 @@ public class Commands {
      * @return the created order
      */
     public static Order createOrderFromCart(final BlockingSphereClient client, final Cart cart){
-        final OrderFromCartCreateCommand command = OrderFromCartCreateCommand.of(cart);
-        return client.executeBlocking(command);
+        //TODO 3.9. Create the command and execute it
+        return null;
     }
 
     /**

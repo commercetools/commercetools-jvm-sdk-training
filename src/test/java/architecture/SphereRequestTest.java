@@ -76,7 +76,6 @@ public class SphereRequestTest extends BaseTest {
         final Category result = ct().complete(request);
         /* end: do not modify */
 
-        //TODO fix the assertions
         final String observedId = result.getId();
         assertThat(observedId).isEqualTo(id);
     }

@@ -13,13 +13,15 @@ class Utils {
      * @return Sphere client
      */
     static BlockingSphereClient createSphereClient() {
-        final String projectKey = "fyayc-hou-42";
-        final String clientId = "Olmu4RPsFJZvN82npylM6jII";
-        final String clientSecret = "VdELOheKjPbprfWrbG5wrYUZZ01ojARr";
+        //TODO 3.1.1. Get the project info from the Admin Center
+        final String projectKey = "";
+        final String clientId = "";
+        final String clientSecret = "";
 
-        final SphereClientConfig clientConfig = SphereClientConfig.of(projectKey, clientId, clientSecret);
+        //TODO 3.1.2. Create the configuration for the sphere client
 
-        return BlockingSphereClient.of(SphereClientFactory.of().createClient(clientConfig), Duration.ofMinutes(1));
+        //TODO 3.1.3. Create the client and return it
+        return null;
     }
 
 }

@@ -41,21 +41,22 @@ public class Main {
      * @return The created order
      */
     private static Order onlineShop(final BlockingSphereClient client){
-        cart = queryFirstCart(client);
-        System.out.println("Cart with id " + cart.getId() + " is queried/created");
+        //TODO 3.6.2. Call the method queryFirstCart
+        //System.out.println("Cart with id " + cart.getId() + " is queried/created");
 
-        cart = addProductToCart(client, product.getId(), cart, 1L);
-        System.out.println("Product with id " + product.getId() + " is added to cart.");
+        //TODO 3.7. Call addProductToCart
+        //System.out.println("Product with id " + product.getId() + " is added to cart.");
 
-        cart = setShippingAddress(client, address, cart);
-        System.out.println("Set address to cart with id " + cart.getId());
+        //TODO 3.8. Call setShippingAddress
+        //System.out.println("Set address to cart with id " + cart.getId());
 
         // Checkout process continues...
 
         // When it is confirmed and paid, we create the order
-        Order order = createOrderFromCart(client, cart);
-        System.out.println("Order with id " + order.getId() + " is added to cart with id " + cart.getId());
+        //TODO 3.9. Call the method createOrderFromCart
+        //System.out.println("Order with id " + order.getId() + " is added to cart with id " + cart.getId());
 
-        return order;
+        //Return order
+        return null;
     }
 }

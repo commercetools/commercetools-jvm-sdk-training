@@ -36,17 +36,15 @@ public class Project {
      * @param client CTP client
      */
     public static void setUpProject(final BlockingSphereClient client){
-        ProductType productType = queryFirstProductType(client);
-        System.out.println("Product type " + productType.getName() + " is queried/created.");
+        //TODO 3.4. Call the methods queryFirstProductType and createProduct
+        //System.out.println("Product type " + productType.getName() + " is queried/created.");
+        //System.out.println("Product with id " + product.getId() + " is created.");
 
-        product = createProduct(client, productType, PRODUCT_NAME, PRODUCT_KEY, PRODUCT_SKU);
-        System.out.println("Product with id " + product.getId() + " is created.");
+        //TODO 3.5.2. Call queryFirstTaxCategory
+        //System.out.println("Tax category " + taxCategory.getName() + " is selected.");
 
-        taxCategory = queryFirstTaxCategory(client);
-        System.out.println("Tax category " + taxCategory.getName() + " is selected.");
-
-        product = setTaxCategoryWithProductKeyAndVersion(client, PRODUCT_KEY, productVersion, taxCategory);
-        System.out.println("Tax category " + taxCategory.getName() + " is set to " + product.getId());
+        //TODO 3.5.4. Call setTaxCategoryWithProductKeyAndVersion
+        //System.out.println("Tax category " + taxCategory.getName() + " is set to " + product.getId());
     }
 
     /**
