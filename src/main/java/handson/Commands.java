@@ -415,4 +415,8 @@ public class Commands {
     public static void deleteProducts(BlockingSphereClient client, List<Product> productList){
         productList.forEach(product -> deleteProduct(client, product));
     }
+
+    public static void createSubscription(BlockingSphereClient client){
+        // TODO: as soon as subscriptions are implemented in the JVM SDK
+    }
 }

@@ -1,5 +1,6 @@
 package handson;
 
+import com.amazonaws.regions.Regions;
 import com.neovisionaries.i18n.CountryCode;
 import io.sphere.sdk.client.BlockingSphereClient;
 import io.sphere.sdk.models.Address;
@@ -11,6 +12,8 @@ import java.util.concurrent.ExecutionException;
 
 import static handson.Commands.*;
 import static handson.Project.*;
+import static handson.Utils.createQueue;
+import static handson.Utils.createSQSClient;
 import static handson.Utils.createSphereClient;
 
 public class Main {
@@ -21,13 +24,14 @@ public class Main {
 
         try (final BlockingSphereClient client = createSphereClient()){
 
-            setUpProject(client);
-
-            final Order order = onlineShop(client);
-
-            // .. the order in a microservice, e.g. send confirmation email to the customer.
-
-            cleanUpProject(client, product, taxCategory, cart, order);
+            createQueue(Regions.EU_CENTRAL_1, "default");
+//            setUpProject(client);
+//
+//            final Order order = onlineShop(client);
+//
+//            // .. the order in a microservice, e.g. send confirmation email to the customer.
+//
+//            cleanUpProject(client, product, taxCategory, cart, order);
         }
     }
 
