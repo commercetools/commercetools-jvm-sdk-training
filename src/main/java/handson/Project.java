@@ -37,16 +37,16 @@ public class Project {
      */
     public static void setUpProject(final BlockingSphereClient client){
         ProductType productType = queryFirstProductType(client);
-        System.out.println("Product type " + productType.getName() + " is queried/created.");
+        System.out.println("[POST] Product type " + productType.getName() + " is queried/created.");
 
         product = createProduct(client, productType, PRODUCT_NAME, PRODUCT_KEY, PRODUCT_SKU);
-        System.out.println("Product with id " + product.getId() + " is created.");
+        System.out.println("[POST] Product with id " + product.getId() + " is created.");
 
         taxCategory = queryFirstTaxCategory(client);
-        System.out.println("Tax category " + taxCategory.getName() + " is selected.");
+        System.out.println("[POST] Tax category " + taxCategory.getName() + " is selected.");
 
         product = setTaxCategoryWithProductKeyAndVersion(client, PRODUCT_KEY, productVersion, taxCategory);
-        System.out.println("Tax category " + taxCategory.getName() + " is set to " + product.getId());
+        System.out.println("[POST] Tax category " + taxCategory.getName() + " is set to " + product.getId());
     }
 
     /**
@@ -55,7 +55,6 @@ public class Project {
      */
     public static void cleanUpProject(BlockingSphereClient client){
         List<Product> allProducts = queryAllProducts(client).getResults();
-        System.out.println("All products are queried.");
         deleteProducts(client, allProducts);
 
         // deleteProductType(client, productType);
@@ -84,16 +83,12 @@ public class Project {
                                       Cart cart,
                                       Order order) {
         deleteProduct(client, product);
-        LOGGER.debug("Product with the id {} is deleted", product.getId());
 
         deleteTaxCategory(client, taxCategory);
-        LOGGER.debug("Tax category with the id {} is deleted", taxCategory.getId());
 
         cart = queryCartById(client, cart.getId());
         deleteCart(client, cart);
-        LOGGER.debug("Cart with the id {} is deleted", cart.getId());
 
         deleteOrder(client, order);
-        LOGGER.debug("Order with the id {} is deleted", order.getId());
     }
 }

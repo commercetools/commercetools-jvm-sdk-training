@@ -195,7 +195,7 @@ public class Commands {
     public static void deleteProduct(final BlockingSphereClient client, final Product product) {
         final ProductDeleteCommand deleteCommand = ProductDeleteCommand.of(product);
         client.executeBlocking(deleteCommand);
-        LOGGER.debug("Product with id {} is deleted.", product.getId());
+        System.out.println("[DELETE] Product with id " + product.getId() + " is deleted.");
     }
 
     /**
@@ -234,7 +234,7 @@ public class Commands {
     public static void deleteTaxCategory(final BlockingSphereClient client, final TaxCategory taxCategory){
         TaxCategoryDeleteCommand deleteCommand = TaxCategoryDeleteCommand.of(taxCategory);
         client.executeBlocking(deleteCommand);
-        LOGGER.debug("Tax category {} is deleted.", taxCategory.getName());
+        System.out.println("[DELETE] Tax category with id " + taxCategory.getName() + " is deleted.");
     }
 
     /**
@@ -244,7 +244,6 @@ public class Commands {
      */
     public static PagedQueryResult<TaxCategory> queryAllTaxCategories(BlockingSphereClient client){
         TaxCategoryQuery request = TaxCategoryQuery.of();
-        LOGGER.debug("All tax categories are queried.");
         return client.executeBlocking(request);
     }
 
@@ -303,7 +302,6 @@ public class Commands {
      */
     public static PagedQueryResult<Cart> queryAllCarts(BlockingSphereClient client){
         CartQuery request = CartQuery.of();
-        LOGGER.debug("All carst are queried.");
         return client.executeBlocking(request);
     }
 
@@ -315,6 +313,7 @@ public class Commands {
     public static void deleteCart(final BlockingSphereClient client, Cart cart){
         CartDeleteCommand deleteCommand = CartDeleteCommand.of(cart);
         client.executeBlocking(deleteCommand);
+        System.out.println("[DELETE] Cart with id " + cart.getId() + " is deleted.");
     }
 
     /**
@@ -374,7 +373,7 @@ public class Commands {
     public static void deleteOrder(final BlockingSphereClient client, Order order){
         OrderDeleteCommand deleteCommand = OrderDeleteCommand.of(order);
         client.executeBlocking(deleteCommand);
-        LOGGER.debug("Order with id {} is deleted.", order.getId());
+        System.out.println("[DELETE] Order with id " + order.getId() + " is deleted.");
     }
 
     /**
@@ -384,7 +383,6 @@ public class Commands {
      */
     public static PagedQueryResult<Order> queryAllOrders(final BlockingSphereClient client){
         OrderQuery request = OrderQuery.of();
-        System.out.println("All orders are queried.");
         return client.executeBlocking(request);
     }
 

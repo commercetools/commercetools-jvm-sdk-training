@@ -27,7 +27,7 @@ public class Main {
 
             // .. the order in a microservice, e.g. send confirmation email to the customer.
 
-            cleanUpProject(client, product, taxCategory, cart, order);
+            cleanUpProject(client);
         }
     }
 
@@ -42,19 +42,19 @@ public class Main {
      */
     private static Order onlineShop(final BlockingSphereClient client){
         cart = queryFirstCart(client);
-        System.out.println("Cart with id " + cart.getId() + " is queried/created");
+        System.out.println("[POST] Cart with id " + cart.getId() + " is queried/created");
 
         cart = addProductToCart(client, product.getId(), cart, 1L);
-        System.out.println("Product with id " + product.getId() + " is added to cart.");
+        System.out.println("[POST] Product with id " + product.getId() + " is added to cart.");
 
         cart = setShippingAddress(client, address, cart);
-        System.out.println("Set address to cart with id " + cart.getId());
+        System.out.println("[POST] Set address to cart with id " + cart.getId());
 
         // Checkout process continues...
 
         // When it is confirmed and paid, we create the order
         Order order = createOrderFromCart(client, cart);
-        System.out.println("Order with id " + order.getId() + " is added to cart with id " + cart.getId());
+        System.out.println("[POST] Order with id " + order.getId() + " is added to cart with id " + cart.getId());
 
         return order;
     }
