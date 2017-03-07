@@ -15,7 +15,7 @@ class Utils {
     static BlockingSphereClient createSphereClient() {
         final String projectKey = "fyayc-hou-42";
         final String clientId = "Olmu4RPsFJZvN82npylM6jII";
-        final String clientSecret = "VdELOheKjPbprfWrbG5wrYUZZ01ojARr";
+        final String clientSecret = "";
 
         final SphereClientConfig clientConfig = SphereClientConfig.of(projectKey, clientId, clientSecret);
 
