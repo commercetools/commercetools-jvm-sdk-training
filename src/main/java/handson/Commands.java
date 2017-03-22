@@ -30,6 +30,9 @@ import io.sphere.sdk.products.commands.updateactions.SetTaxCategory;
 import io.sphere.sdk.products.queries.ProductProjectionQuery;
 import io.sphere.sdk.products.queries.ProductProjectionQueryModel;
 import io.sphere.sdk.products.queries.ProductQuery;
+import io.sphere.sdk.products.search.ProductDataFacetSearchModel;
+import io.sphere.sdk.products.search.ProductProjectionSearch;
+import io.sphere.sdk.products.search.ProductProjectionSearchModel;
 import io.sphere.sdk.producttypes.ProductType;
 import io.sphere.sdk.producttypes.ProductTypeDraft;
 import io.sphere.sdk.producttypes.commands.ProductTypeCreateCommand;
@@ -37,6 +40,9 @@ import io.sphere.sdk.producttypes.commands.ProductTypeDeleteCommand;
 import io.sphere.sdk.producttypes.queries.ProductTypeQuery;
 import io.sphere.sdk.queries.PagedQueryResult;
 import io.sphere.sdk.queries.QueryPredicate;
+import io.sphere.sdk.search.PagedSearchResult;
+import io.sphere.sdk.search.TermFacetExpression;
+import io.sphere.sdk.search.TermStats;
 import io.sphere.sdk.taxcategories.*;
 import io.sphere.sdk.taxcategories.commands.TaxCategoryCreateCommand;
 import io.sphere.sdk.taxcategories.commands.TaxCategoryDeleteCommand;
@@ -49,13 +55,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.money.CurrencyUnit;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static io.sphere.sdk.models.DefaultCurrencyUnits.EUR;
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Locale.ENGLISH;
 
@@ -65,6 +68,8 @@ public class Commands {
 
     private static final String PRODUCT_TYPE_KEY = RandomStringUtils.randomAlphanumeric(10);
     private static  final String PRODUCT_TYPE_NAME = "Mobile Phone";
+
+    public static final ProductDataFacetSearchModel PRODUCT_MODEL = ProductProjectionSearchModel.of().facet();
 
     /**
      * Creates a Product Type with attribute:
@@ -413,4 +418,51 @@ public class Commands {
     public static void deleteProducts(BlockingSphereClient client, List<Product> productList){
         productList.forEach(product -> deleteProduct(client, product));
     }
+
+    /**
+     * Creates facets created using the given attribute
+     * @param client CTP client
+     * @param attributeName name of the attribute used to create the facets
+     * @return list of terms with count
+     */
+    public static List<TermStats> termFacetsForAttributes(BlockingSphereClient client, String attributeName){
+        final TermFacetExpression<ProductProjection> facetExpr = PRODUCT_MODEL.allVariants().attribute().ofString(attributeName).allTerms();
+        final ProductProjectionSearch search = ProductProjectionSearch.ofStaged().plusFacets(facetExpr);
+
+        return client.executeBlocking(search)
+                .getFacetResult(facetExpr)
+                .getTerms();
+    }
+
+    /**
+     * Filters products using given attribute name and value
+     * @param client CTP client
+     * @param attributeName name of the attribute used for filtering e.g. "color"
+     * @param attributeValue value of the attribute used for filtering e.g. "red"
+     * @return matching products
+     */
+    public static PagedSearchResult<ProductProjection> filterByTerm(BlockingSphereClient client,
+                                                                    String attributeName,
+                                                                    String attributeValue) {
+
+        ProductProjectionSearch search = ProductProjectionSearch.ofStaged()
+                .plusQueryFilters(productModel -> productModel.allVariants()
+                        .attribute().ofString(attributeName).is(attributeValue));
+
+        return client.executeBlocking(search);
+    }
+
+    /**
+     * Counts the products filtered by the given attribute name and value
+     * @param client CTP client
+     * @param attributeName name of the attribute used for filtering e.g. "color"
+     * @param attributeValue value of the attribute used for filtering e.g. "red"
+     * @return count of matching products
+     */
+    public static Long countProductsFilterByTerm(BlockingSphereClient client,
+                                                 String attributeName,
+                                                 String attributeValue){
+        return filterByTerm(client, attributeName, attributeValue).getTotal();
+    }
+
 }

@@ -21,13 +21,19 @@ public class Main {
 
         try (final BlockingSphereClient client = createSphereClient()){
 
-            setUpProject(client);
+//            System.out.println(
+//                    "number of products for filtering by term " +
+//                            countProductsFilterByTerm(client, "color", "red"));
+            System.out.println(termFacetsForAttributes(client, "color"));
 
-            final Order order = onlineShop(client);
 
-            // .. the order in a microservice, e.g. send confirmation email to the customer.
-
-            cleanUpProject(client);
+//            setUpProject(client);
+//
+//            final Order order = onlineShop(client);
+//
+//            // .. the order in a microservice, e.g. send confirmation email to the customer.
+//
+//            cleanUpProject(client);
         }
     }
 
