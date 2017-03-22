@@ -13,14 +13,14 @@ class Utils {
      * @return Sphere client
      */
     static BlockingSphereClient createSphereClient() {
-        //TODO 3.1.1. Get the project info from the Admin Center
+        //TODO 1.1.1. Get the project info from the Admin Center
         final String projectKey = "";
         final String clientId = "";
         final String clientSecret = "";
 
-        //TODO 3.1.2. Create the configuration for the sphere client
+        //TODO 1.1.2. Create the configuration for the sphere client
 
-        //TODO 3.1.3. Create the client and return it
+        //TODO 1.1.3. Create the client and return it
         return null;
     }
 
