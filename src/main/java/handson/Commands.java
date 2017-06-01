@@ -109,11 +109,11 @@ public class Commands {
         return null;
     }
 
-    /**
-     * Queries a Product by id
+     /**
+     * Queries a Product variant by sku
      * @param client CTP client
-     * @param sku the sku of the product
-     * @return the requested product
+     * @param sku the sku of the product variant
+     * @return the requested product variant
      */
     public static ProductVariant queryProductVariant(final BlockingSphereClient client, final String sku)
             throws ExecutionException, InterruptedException {
