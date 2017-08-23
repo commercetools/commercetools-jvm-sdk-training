@@ -6,11 +6,10 @@ import io.sphere.sdk.customers.commands.*;
 
 import java.util.concurrent.CompletionStage;
 
-public class CustomerService {
-    private final SphereClient client;
+public class CustomerService extends AbstractService {
 
     public CustomerService(final SphereClient client) {
-        this.client = client;
+        super(client);
     }
 
     public CompletionStage<Customer> verifyEmail(final CustomerToken customerToken) {
