@@ -5,6 +5,7 @@ import io.sphere.sdk.carts.CartDraftBuilder;
 import io.sphere.sdk.carts.CartDraftDsl;
 import io.sphere.sdk.carts.commands.CartCreateCommand;
 import io.sphere.sdk.carts.commands.CartUpdateCommand;
+import io.sphere.sdk.carts.commands.updateactions.AddDiscountCode;
 import io.sphere.sdk.carts.commands.updateactions.AddLineItem;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.customers.Customer;
@@ -30,5 +31,9 @@ public class CartService extends AbstractService {
     public CompletionStage<Cart> addToCart(final Cart cart, final ProductProjection productProjection) {
         final AddLineItem addLineItem = AddLineItem.of(productProjection.getId(), productProjection.getMasterVariant().getId(), 1L);
         return client.execute(CartUpdateCommand.of(cart, addLineItem));
+    }
+
+    public CompletionStage<Cart> addDiscount(final Cart cart, final String code) {
+        return client.execute(CartUpdateCommand.of(cart, AddDiscountCode.of(code)));
     }
 }

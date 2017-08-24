@@ -28,7 +28,7 @@ public class CartServiceTest extends BaseTest {
     }
 
     @Test
-    public void createCartAndAddProduct() throws ExecutionException, InterruptedException {
+    public void createCartAddProductAndDiscount() throws ExecutionException, InterruptedException {
         final String email = String.format("%s@example.com", UUID.randomUUID().toString());
 
         final CompletableFuture<Cart> cartCreationResult = customerService.createCustomer(email, "password")
@@ -48,5 +48,10 @@ public class CartServiceTest extends BaseTest {
 
         final Cart updatedCart = addToCartResult.get();
         assertThat(updatedCart.getLineItems()).hasSize(1);
+
+        final CompletableFuture<Cart> discountedResult = cartService.addDiscount(updatedCart, "CHRISTMAS17")
+                .toCompletableFuture();
+        final Cart discountedCart = discountedResult.get();
+        assertThat(discountedCart.getDiscountCodes()).hasSize(1);
     }
 }
