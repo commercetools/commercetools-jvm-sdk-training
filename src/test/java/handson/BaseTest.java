@@ -1,6 +1,9 @@
 package handson;
 
-import io.sphere.sdk.client.*;
+import io.sphere.sdk.client.SphereAccessTokenSupplier;
+import io.sphere.sdk.client.SphereAsyncHttpClientFactory;
+import io.sphere.sdk.client.SphereClient;
+import io.sphere.sdk.client.SphereClientConfig;
 import io.sphere.sdk.http.HttpClient;
 import org.junit.After;
 import org.junit.Before;
@@ -13,13 +16,17 @@ public class BaseTest {
 
     @Before
     public void setup() throws IOException {
+        client = createSphereClient("/dev.properties");
+    }
+
+    protected SphereClient createSphereClient(String configLocation) throws IOException {
         final Properties properties = new Properties();
-        properties.load(getClass().getResourceAsStream("/dev.properties"));
+        properties.load(getClass().getResourceAsStream(configLocation));
 
         final SphereClientConfig sphereClientConfig = SphereClientConfig.ofProperties(properties, "");
         final HttpClient httpClient = SphereAsyncHttpClientFactory.create();
         SphereAccessTokenSupplier tokenSupplier = SphereAccessTokenSupplier.ofAutoRefresh(sphereClientConfig, httpClient, true);
-        client = SphereClient.of(sphereClientConfig, httpClient, tokenSupplier);
+        return SphereClient.of(sphereClientConfig, httpClient, tokenSupplier);
     }
 
     @After

@@ -17,4 +17,9 @@ public class ProductSearchService extends AbstractService {
     public CompletionStage<PagedSearchResult<ProductProjection>> fulltextSearch(final LocalizedStringEntry searchText) {
         return client.execute(ProductProjectionSearch.ofCurrent().withText(searchText));
     }
+
+    public CompletionStage<PagedSearchResult<ProductProjection>> facetSearch(final String attributeName, String attributeValue) {
+        return client.execute(ProductProjectionSearch.ofStaged()
+                .plusQueryFilters(productModel -> productModel.allVariants().attribute().ofString(attributeName).is(attributeValue)));
+    }
 }
