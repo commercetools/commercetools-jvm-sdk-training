@@ -47,4 +47,11 @@ public class ProductQueryServiceTest extends BaseTest {
         assertThat(productsWithCategory.getResults()).isNotEmpty();
     }
 
+    @Test
+    public void findProductsWithCategory() throws ExecutionException, InterruptedException {
+        final CompletableFuture<PagedQueryResult<ProductProjection>> productsOnSaleResult =
+                productQueryService.findProductsWithCategory(Locale.ENGLISH, "Sale").toCompletableFuture();
+        final PagedQueryResult<ProductProjection> productsOnSale = productsOnSaleResult.get();
+        assertThat(productsOnSale.getResults()).isNotEmpty();
+    }
 }

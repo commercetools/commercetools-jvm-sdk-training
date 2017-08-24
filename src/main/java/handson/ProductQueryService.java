@@ -17,11 +17,17 @@ public class ProductQueryService extends AbstractService {
         super(client);
     }
 
+
     public CompletionStage<PagedQueryResult<Category>> findCategory(final Locale locale, final String name) {
         return client.execute(CategoryQuery.of().byName(locale, name));
     }
 
     public CompletionStage<PagedQueryResult<ProductProjection>> withCategory(final Category category) {
         return client.execute(ProductProjectionQuery.ofStaged().withPredicates(m -> m.categories().isIn(Arrays.asList(category))));
+    }
+
+    public CompletionStage<PagedQueryResult<ProductProjection>> findProductsWithCategory(final Locale locale, final String name) {
+        return findCategory(locale, name).thenComposeAsync(
+                categoryPagedQueryResult -> withCategory(categoryPagedQueryResult.getResults().get(0)));
     }
 }

@@ -17,11 +17,11 @@ public class CustomerService extends AbstractService {
     }
 
     public CompletionStage<CustomerToken> register(final String email, final String password) {
-        return create(email, password).thenComposeAsync(
+        return createCustomer(email, password).thenComposeAsync(
                 customerSignInResult -> createEmailVerificationToken(customerSignInResult.getCustomer()));
     }
 
-    public CompletionStage<CustomerSignInResult> create(final String email, final String password) {
+    public CompletionStage<CustomerSignInResult> createCustomer(final String email, final String password) {
         final CustomerDraftDsl newCustomer = CustomerDraftBuilder.of(email, password)
                 .build();
 
