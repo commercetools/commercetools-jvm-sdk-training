@@ -9,7 +9,7 @@ import io.sphere.sdk.http.HttpClient;
 import java.io.IOException;
 import java.util.Properties;
 
-public class Utils {
+public class ClientService {
     /**
      * Creates a blocking sphere client
      * @return Sphere client
@@ -31,7 +31,7 @@ public class Utils {
      */
     private static SphereClientConfig loadCTPClientConfig() throws IOException {
         final Properties prop = new Properties();
-        prop.load(Utils.class.getResourceAsStream("/dev.properties"));
+        prop.load(ClientService.class.getResourceAsStream("/dev.properties"));
 
         //TODO 1.1.2. Create the configuration for the sphere client
         return SphereClientConfig.ofProperties(prop, "");
