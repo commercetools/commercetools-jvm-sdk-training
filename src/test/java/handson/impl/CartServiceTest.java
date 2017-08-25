@@ -1,8 +1,6 @@
-package handson;
+package handson.impl;
 
 import io.sphere.sdk.carts.Cart;
-import io.sphere.sdk.orders.Order;
-import io.sphere.sdk.orders.OrderState;
 import io.sphere.sdk.products.ProductProjection;
 import io.sphere.sdk.queries.PagedQueryResult;
 import org.junit.Before;
@@ -16,11 +14,10 @@ import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class OrderServiceTest extends BaseTest {
+public class CartServiceTest extends BaseTest {
     private CustomerService customerService;
     private ProductQueryService productQueryService;
     private CartService cartService;
-    private OrderService orderService;
 
     @Before
     public void setup() throws IOException {
@@ -28,11 +25,10 @@ public class OrderServiceTest extends BaseTest {
         customerService = new CustomerService(client());
         productQueryService = new ProductQueryService(client());
         cartService = new CartService(client());
-        orderService = new OrderService(client());
     }
 
     @Test
-    public void createOrder() throws ExecutionException, InterruptedException {
+    public void createCartAddProductAndDiscount() throws ExecutionException, InterruptedException {
         final String email = String.format("%s@example.com", UUID.randomUUID().toString());
 
         final CompletableFuture<Cart> cartCreationResult = customerService.createCustomer(email, "password")
@@ -48,16 +44,14 @@ public class OrderServiceTest extends BaseTest {
         final PagedQueryResult<ProductProjection> productProjectionPagedQueryResult = productsOnSaleResult.get();
         final ProductProjection productProjection = productProjectionPagedQueryResult.getResults().get(0);
 
-        final CompletableFuture<Cart> addToCartResult = cartService.addToCart(cart, productProjection).toCompletableFuture();
+        final CompletableFuture<Cart> addToCartResult = cartService.addProductToCart(productProjection, cart).toCompletableFuture();
 
         final Cart updatedCart = addToCartResult.get();
+        assertThat(updatedCart.getLineItems()).hasSize(1);
 
-        final CompletableFuture<Order> orderCompletionResult = orderService.createOrder(updatedCart).thenComposeAsync(
-                order -> orderService.changeState(order, OrderState.COMPLETE))
+        final CompletableFuture<Cart> discountedResult = cartService.addDiscountToCart("CHRISTMAS17", updatedCart)
                 .toCompletableFuture();
-
-        final Order order = orderCompletionResult.get();
-        assertThat(order.getState()).isEqualTo(OrderState.COMPLETE);
+        final Cart discountedCart = discountedResult.get();
+        assertThat(discountedCart.getDiscountCodes()).hasSize(1);
     }
-
 }

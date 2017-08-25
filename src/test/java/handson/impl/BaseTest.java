@@ -1,4 +1,4 @@
-package handson;
+package handson.impl;
 
 import io.sphere.sdk.client.SphereAccessTokenSupplier;
 import io.sphere.sdk.client.SphereAsyncHttpClientFactory;
@@ -25,7 +25,7 @@ public class BaseTest {
 
         final SphereClientConfig sphereClientConfig = SphereClientConfig.ofProperties(properties, "");
         final HttpClient httpClient = SphereAsyncHttpClientFactory.create();
-        SphereAccessTokenSupplier tokenSupplier = SphereAccessTokenSupplier.ofAutoRefresh(sphereClientConfig, httpClient, true);
+        final SphereAccessTokenSupplier tokenSupplier = SphereAccessTokenSupplier.ofAutoRefresh(sphereClientConfig, httpClient, true);
         return SphereClient.of(sphereClientConfig, httpClient, tokenSupplier);
     }
 

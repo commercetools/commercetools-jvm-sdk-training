@@ -1,4 +1,4 @@
-package handson;
+package handson.impl;
 
 import io.sphere.sdk.customers.Customer;
 import io.sphere.sdk.customers.CustomerToken;
@@ -25,7 +25,8 @@ public class CustomerServiceTest extends BaseTest {
     public void registerCustomer() throws ExecutionException, InterruptedException {
         final String email = String.format("%s@example.com", UUID.randomUUID().toString());
 
-        final CompletableFuture<CustomerToken> customerTokenResult = customerService.register(email, "password")
+        final CompletableFuture<CustomerToken> customerTokenResult = customerService.createCustomer(email, "password").thenComposeAsync(
+                customerSignInResult -> customerService.createEmailVerificationToken(customerSignInResult.getCustomer(), 5))
                 .toCompletableFuture();
         final CustomerToken customerToken = customerTokenResult.get();
         assertThat(customerToken).isNotNull();

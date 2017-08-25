@@ -1,4 +1,4 @@
-package handson;
+package handson.impl;
 
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.models.LocalizedStringEntry;
