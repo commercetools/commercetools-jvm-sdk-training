@@ -1,15 +1,10 @@
 package handson.impl;
 
 import io.sphere.sdk.carts.Cart;
-import io.sphere.sdk.carts.CartDraftBuilder;
-import io.sphere.sdk.carts.CartDraftDsl;
-import io.sphere.sdk.carts.commands.CartCreateCommand;
 import io.sphere.sdk.carts.commands.CartUpdateCommand;
-import io.sphere.sdk.carts.commands.updateactions.AddDiscountCode;
 import io.sphere.sdk.carts.commands.updateactions.AddLineItem;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.customers.Customer;
-import io.sphere.sdk.models.DefaultCurrencyUnits;
 import io.sphere.sdk.products.ProductProjection;
 
 import java.util.concurrent.CompletionStage;
@@ -30,11 +25,8 @@ public class CartService extends AbstractService {
      * @return the customer creation completion stage
      */
     public CompletionStage<Cart> createCart(final Customer customer) {
-        final CartDraftDsl cartDraft = CartDraftBuilder.of(DefaultCurrencyUnits.EUR)
-                .customerId(customer.getId())
-                .deleteDaysAfterLastModification(1)
-                .build();
-        return client.execute(CartCreateCommand.of(cartDraft));
+        // TODO 3.1
+        return null;
     }
 
     /**
@@ -57,6 +49,7 @@ public class CartService extends AbstractService {
      * @return the cart update completion stage
      */
     public CompletionStage<Cart> addDiscountToCart(final String code, final Cart cart) {
-        return client.execute(CartUpdateCommand.of(cart, AddDiscountCode.of(code)));
+        // TODO 5.1
+        return null;
     }
 }
