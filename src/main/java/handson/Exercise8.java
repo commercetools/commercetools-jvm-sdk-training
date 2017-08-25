@@ -31,6 +31,12 @@ public class Exercise8 {
             PagedSearchResult<ProductProjection> foundProducts = fulltextSearchResult.get();
 
             LOG.info("Found products: {}", foundProducts.getTotal());
+
+            final CompletableFuture<PagedSearchResult<ProductProjection>> facetSearchResult =
+                    productSearchService.facetSearch("color", "red")
+                            .toCompletableFuture();
+            foundProducts = facetSearchResult.get();
+            LOG.info("Found products: {}", foundProducts.getTotal());
         }
     }
 }
