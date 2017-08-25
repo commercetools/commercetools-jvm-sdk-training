@@ -14,6 +14,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
+        <ctp.sdk.version>1.22.0</ctp.sdk.version>
     </properties>
 
     <build>
@@ -34,18 +35,19 @@
         <dependency>
             <groupId>com.commercetools.sdk.jvm.core</groupId>
             <artifactId>commercetools-models</artifactId>
-            <version>1.11.0</version>
+            <version>${ctp.sdk.version}</version>
         </dependency>
         <dependency>
             <groupId>com.commercetools.sdk.jvm.core</groupId>
             <artifactId>commercetools-java-client</artifactId>
-            <version>1.11.0</version>
+            <version>${ctp.sdk.version}</version>
         </dependency>
         <dependency>
             <groupId>com.commercetools.sdk.jvm.core</groupId>
             <artifactId>commercetools-convenience</artifactId>
-            <version>1.11.0</version>
+            <version>${ctp.sdk.version}</version>
         </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
