@@ -18,8 +18,8 @@ import static handson.impl.Utils.createSphereClient;
 /**
  * Registers a new customer.
  */
-public class Excercise2 {
-    private final static Logger LOG = LoggerFactory.getLogger(Excercise2.class);
+public class Exercise2 {
+    private final static Logger LOG = LoggerFactory.getLogger(Exercise2.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {
