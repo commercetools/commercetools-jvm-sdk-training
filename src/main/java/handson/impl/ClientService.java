@@ -19,9 +19,7 @@ public class ClientService {
         final SphereClientConfig clientConfig = loadCTPClientConfig();
 
         //TODO 1.1.3. Create the client
-        final HttpClient httpClient = SphereAsyncHttpClientFactory.create();
-        final SphereAccessTokenSupplier tokenSupplier = SphereAccessTokenSupplier.ofAutoRefresh(clientConfig, httpClient, true);
-        return SphereClient.of(clientConfig, httpClient, tokenSupplier);
+        return null;
     }
 
     /**
@@ -34,6 +32,6 @@ public class ClientService {
         prop.load(ClientService.class.getResourceAsStream("/dev.properties"));
 
         //TODO 1.1.2. Create the configuration for the sphere client
-        return SphereClientConfig.ofProperties(prop, "");
+        return null;
     }
 }
