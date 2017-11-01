@@ -24,7 +24,7 @@ public class SubscriptionService extends AbstractService {
     }
 
     public CompletionStage<Subscription> createSqsSubscription() {
-        // TODO 9.1: create sqs subscription for sqs queue
+        // TODO 9.1 Create sqs subscription for sqs queue
         // HINT: use the createOrderchanges helper method
         return null;
     }
@@ -34,7 +34,7 @@ public class SubscriptionService extends AbstractService {
     }
 
     public CompletionStage<Subscription> deleteSqsSubscriptin(final Subscription subscription) {
-        // TODO 9.2: delete given subscription
+        // TODO 9.2 Delete given subscription
         return null;
     }
 }

@@ -24,7 +24,7 @@ public class ProductSearchService extends AbstractService {
      * @return the full-text search completion stage
      */
     public CompletionStage<PagedSearchResult<ProductProjection>> fulltextSearch(final LocalizedStringEntry searchText) {
-        // TODO 8.1
+        // TODO 8.1 Perform a full-text search
         return null;
     }
 
@@ -36,7 +36,7 @@ public class ProductSearchService extends AbstractService {
      * @return the term facet search completion stage
      */
     public CompletionStage<PagedSearchResult<ProductProjection>> facetSearch(final String attributeName, String attributeValue) {
-        // TODO 8.2
+        // TODO 8.2 Perform a term facet search
         return null;
     }
 }

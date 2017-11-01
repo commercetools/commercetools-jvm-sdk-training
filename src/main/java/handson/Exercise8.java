@@ -32,7 +32,7 @@ public class Exercise8 {
 
             LOG.info("Found products: {}", foundProducts.getTotal());
 
-            // TODO 8.3 call facets search with attribute name: "color" and attribue value: "red"
+            // TODO 8.3 Call facets search with attribute name: "color" and attribue value: "red"
             //     on the "filters-and-facets" project
         }
     }

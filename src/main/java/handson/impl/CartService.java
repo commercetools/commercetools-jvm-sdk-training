@@ -25,7 +25,7 @@ public class CartService extends AbstractService {
      * @return the customer creation completion stage
      */
     public CompletionStage<Cart> createCart(final Customer customer) {
-        // TODO 3.1
+        // TODO 3.1 Create a cart
         return null;
     }
 
@@ -49,7 +49,7 @@ public class CartService extends AbstractService {
      * @return the cart update completion stage
      */
     public CompletionStage<Cart> addDiscountToCart(final String code, final Cart cart) {
-        // TODO 5.1
+        // TODO 5.1 Add discount code to cart
         return null;
     }
 }

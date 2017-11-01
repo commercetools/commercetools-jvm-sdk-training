@@ -24,7 +24,7 @@ public class CustomerService extends AbstractService {
      * @return the customer creation completion stage
      */
     public CompletionStage<CustomerSignInResult> createCustomer(final String email, final String password) {
-        // TODO Exercise 2.1
+        // TODO 2.1 Create a customer
         return null;
     }
 
@@ -37,7 +37,7 @@ public class CustomerService extends AbstractService {
      * @return the customer token creation completion stage
      */
     public CompletionStage<CustomerToken> createEmailVerificationToken(final Customer customer, final Integer timeToLiveInMinutes) {
-        // TODO Exercise 2.2
+        // TODO 2.2 Create an email verification token
         return null;
     }
 
@@ -48,7 +48,7 @@ public class CustomerService extends AbstractService {
      * @return the email verification completion stage
      */
     public CompletionStage<Customer> verifyEmail(final CustomerToken customerToken) {
-        // TODO Exercise 2.4
+        // TODO 2.4 Verify the customer token
         return null;
     }
 }

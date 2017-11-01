@@ -46,7 +46,7 @@ public class Exercise4 {
             final PagedQueryResult<ProductProjection> productProjectionPagedQueryResult = productsOnSaleResult.get();
             final ProductProjection productProjection = productProjectionPagedQueryResult.getResults().get(0);
 
-            // TODO 4.4
+            // TODO 4.4 Get updated cart after adding product to cart
             final CompletableFuture<Cart> addToCartResult = null;
 
             final Cart updatedCart = addToCartResult.get();

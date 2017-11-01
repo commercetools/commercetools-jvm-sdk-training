@@ -25,17 +25,17 @@ public class ProductQueryService extends AbstractService {
      * @return the product query completion stage
      */
     public CompletionStage<PagedQueryResult<ProductProjection>> findProductsWithCategory(final Locale locale, final String name) {
-        // TODO 4.3
+        // TODO 4.3 Find a product with category
         return null;
     }
 
     private CompletionStage<PagedQueryResult<Category>> findCategory(final Locale locale, final String name) {
-        // TODO 4.1
+        // TODO 4.1 Find a category
         return null;
     }
 
     private CompletionStage<PagedQueryResult<ProductProjection>> withCategory(final Category category) {
-        // TODO 4.2
+        // TODO 4.2 Query a category
         return null;
     }
 }

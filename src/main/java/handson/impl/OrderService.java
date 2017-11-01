@@ -23,7 +23,7 @@ public class OrderService extends AbstractService {
      * @return the order creation completion stage
      */
     public CompletionStage<Order> createOrder(final Cart cart) {
-        // TODO 6.1
+        // TODO 6.1 Create a new order from cart
         return null;
     }
 
@@ -35,7 +35,7 @@ public class OrderService extends AbstractService {
      * @return the order state change completion stage
      */
     public CompletionStage<Order> changeState(final Order order, final OrderState state) {
-        // TODO 7.1
+        // TODO 7.1 Change the state of order
         return null;
     }
 }
