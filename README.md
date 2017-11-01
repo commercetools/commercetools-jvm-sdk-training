@@ -16,15 +16,15 @@ This branch includes tasks to learn the basics of commercetools JVM SDK.
 
 The branch includes a simple CRUD application of following tasks:
 
-- Start a sphere client.
-- Query/Create a product type.
-- Create a product.
-- Update a product: set a tax category.
+- Configure a sphere client.
+- Create a customer.
+- Verify customer's email.
 - Create a cart.
-- Add a product to the cart.
-- Set a shipping address to the cart.
-- Create order from cart.
-- Cleanup project: delete created objects.
+- Find a category, query a category, find a product with category.
+- Add discount code to cart.
+- Create a new order from cart.
+- Change the state of an order.
+- Perform text and facet search.
 
 ## How to Use
 
