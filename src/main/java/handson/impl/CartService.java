@@ -25,7 +25,7 @@ public class CartService extends AbstractService {
      * @return the customer creation completion stage
      */
     public CompletionStage<Cart> createCart(final Customer customer) {
-        // TODO 3.1 Create a cart
+        // TODO 3.1. Create a cart
         return null;
     }
 
@@ -37,8 +37,8 @@ public class CartService extends AbstractService {
      * @return the cart update completion stage
      */
     public CompletionStage<Cart> addProductToCart(final ProductProjection product, final Cart cart) {
-        final AddLineItem addLineItem = AddLineItem.of(product.getId(), product.getMasterVariant().getId(), 1L);
-        return client.execute(CartUpdateCommand.of(cart, addLineItem));
+        // TODO 3.2. Add line item to a cart
+        return null;
     }
 
     /**

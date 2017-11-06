@@ -34,7 +34,7 @@ public class Exercise5 {
 
             final Cart cart = cartCreationResult.get();
 
-            final CompletableFuture<Cart> discountedCartResult = cartService.addDiscountToCart("", cart).toCompletableFuture();
+            final CompletableFuture<Cart> discountedCartResult = cartService.addDiscountToCart("TESTCODE", cart).toCompletableFuture();
 
             final Cart updatedCart = discountedCartResult.get();
 

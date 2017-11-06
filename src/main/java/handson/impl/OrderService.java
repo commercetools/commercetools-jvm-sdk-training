@@ -35,7 +35,7 @@ public class OrderService extends AbstractService {
      * @return the order state change completion stage
      */
     public CompletionStage<Order> changeState(final Order order, final OrderState state) {
-        // TODO 7.1 Change the state of order
+        // TODO 7.1 Change the state of an order
         return null;
     }
 }

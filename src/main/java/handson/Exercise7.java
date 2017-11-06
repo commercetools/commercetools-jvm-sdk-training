@@ -44,7 +44,7 @@ public class Exercise7 {
             final Cart cart = cartCreationResult.get();
 
             final CompletableFuture<PagedQueryResult<ProductProjection>> productsOnSaleResult =
-                    productQueryService.findProductsWithCategory(Locale.ENGLISH, "Sale")
+                    productQueryService.findProductsWithCategory(Locale.ENGLISH, "Test Category en xiKn02mJAG")
                             .toCompletableFuture();
 
             final PagedQueryResult<ProductProjection> productProjectionPagedQueryResult = productsOnSaleResult.get();
