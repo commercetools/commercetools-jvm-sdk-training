@@ -30,7 +30,7 @@ public class Exercise2 {
 
             final CompletionStage<CustomerSignInResult> customerCreationResult = customerService.createCustomer(email, "password");
 
-            // TODO Exercise 2.5 call verify email
+            // TODO 2.5 call verify email
             final CompletableFuture<CustomerToken> customerTokenResult = null;
             final CustomerToken customerToken = customerTokenResult.get();
 
