@@ -1,9 +1,12 @@
 package handson;
 
 import handson.impl.CartService;
+import handson.impl.ClientService;
 import handson.impl.CustomerService;
 import io.sphere.sdk.carts.Cart;
 import io.sphere.sdk.client.SphereClient;
+import io.sphere.sdk.customers.Customer;
+import io.sphere.sdk.products.ProductProjection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +20,10 @@ import static handson.impl.ClientService.createSphereClient;
 
 /**
  * Create a cart for a customer.
+ *
+ * See:
+ *  TODO 3.1 {@link CartService#createCart(Customer)}
+ *  TODO 3.2 {@link CartService#addProductToCart(ProductProjection, Cart)}
  */
 public class Exercise3 {
     private final static Logger LOG = LoggerFactory.getLogger(Exercise3.class);

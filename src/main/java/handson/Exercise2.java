@@ -1,5 +1,6 @@
 package handson;
 
+import handson.impl.ClientService;
 import handson.impl.CustomerService;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.customers.Customer;
@@ -18,6 +19,11 @@ import static handson.impl.ClientService.createSphereClient;
 
 /**
  * Registers a new customer.
+ *
+ * See:
+ *  TODO 2.1 {@link CustomerService#createCustomer(String, String)}
+ *  TODO 2.2 {@link CustomerService#createEmailVerificationToken(Customer, Integer)}
+ *  TODO 2.3 {@link CustomerService#verifyEmail(CustomerToken)}
  */
 public class Exercise2 {
     private final static Logger LOG = LoggerFactory.getLogger(Exercise2.class);
@@ -30,8 +36,9 @@ public class Exercise2 {
 
             final CompletionStage<CustomerSignInResult> customerCreationResult = customerService.createCustomer(email, "password");
 
-            // TODO 2.5 call verify email
-            final CompletableFuture<CustomerToken> customerTokenResult = null;
+            final CompletableFuture<CustomerToken> customerTokenResult =
+                    customerCreationResult.thenComposeAsync(customerSignInResult -> customerService.createEmailVerificationToken(customerSignInResult.getCustomer(), 5))
+                            .toCompletableFuture();
             final CustomerToken customerToken = customerTokenResult.get();
 
             final CompletableFuture<Customer> verifyEmailResult = customerService.verifyEmail(customerToken)

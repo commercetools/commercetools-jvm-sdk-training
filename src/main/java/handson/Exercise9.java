@@ -23,6 +23,10 @@ import static handson.impl.ClientService.createSphereClient;
 /**
  * Create a subscription for OrderCreatedMessages.
  * Create a cart for a customer, add a product to it, create an order from the cart and change the order state.
+ *
+ * See:
+ *  TODO 9.1 {@link SubscriptionService#createSqsSubscription()}
+ *  TODO 9.2 {@link SubscriptionService#deleteSqsSubscriptin(Subscription)}
  */
 public class Exercise9 {
     private final static Logger LOG = LoggerFactory.getLogger(Exercise9.class);

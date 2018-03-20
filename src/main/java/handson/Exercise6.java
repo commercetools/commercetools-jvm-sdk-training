@@ -23,6 +23,9 @@ import static handson.impl.ClientService.createSphereClient;
 
 /**
  * Create a cart for a customer, add a product to it and create an order from the cart.
+ *
+ * See:
+ *  TODO 6.1 {@link OrderService#createOrder(Cart)}
  */
 public class Exercise6 {
     private final static Logger LOG = LoggerFactory.getLogger(Exercise6.class);

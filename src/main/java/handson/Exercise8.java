@@ -17,6 +17,10 @@ import static handson.impl.ClientService.createSphereClient;
 
 /**
  * Full text search and term facets search for products.
+ *
+ * See:
+ *  TODO 8.1 {@link ProductSearchService#fulltextSearch(LocalizedStringEntry)}
+ *  TODO 8.2 {@link ProductSearchService#facetSearch(String, String)}
  */
 public class Exercise8 {
     private final static Logger LOG = LoggerFactory.getLogger(Exercise8.class);

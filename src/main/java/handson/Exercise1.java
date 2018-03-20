@@ -1,5 +1,6 @@
 package handson;
 
+import handson.impl.ClientService;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.projects.Project;
 import io.sphere.sdk.projects.queries.ProjectGet;
@@ -14,6 +15,11 @@ import static handson.impl.ClientService.createSphereClient;
 
 /**
  * Configure sphere client and get project information.
+ *
+ * See:
+ *  TODO 1.1 dev.properties
+ *  TODO 1.2 {@link ClientService#loadCTPClientConfig()}
+ *  TODO 1.3 {@link ClientService#createSphereClient()}
  */
 public class Exercise1 {
     private final static Logger LOG = LoggerFactory.getLogger(Exercise1.class);

@@ -4,6 +4,7 @@ import handson.impl.CartService;
 import handson.impl.CustomerService;
 import handson.impl.ProductQueryService;
 import io.sphere.sdk.carts.Cart;
+import io.sphere.sdk.categories.Category;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.products.ProductProjection;
 import io.sphere.sdk.queries.PagedQueryResult;
@@ -21,6 +22,11 @@ import static handson.impl.ClientService.createSphereClient;
 
 /**
  * Create a cart for a customer and add a product to it.
+ *
+ * See:
+ *  TODO 4.1 {@link ProductQueryService#findCategory(Locale, String)}
+ *  TODO 4.2 {@link ProductQueryService#withCategory(Category)}
+ *  TODO 4.3 {@link ProductQueryService#findProductsWithCategory(Locale, String)}
  */
 public class Exercise4 {
     private final static Logger LOG = LoggerFactory.getLogger(Exercise4.class);

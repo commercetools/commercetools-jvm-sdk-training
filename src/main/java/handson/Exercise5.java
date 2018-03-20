@@ -17,6 +17,9 @@ import static handson.impl.ClientService.createSphereClient;
 
 /**
  * Create a cart for a customer and add a discount to it.
+ *
+ * See:
+ *  TODO 5.1 {@link CartService#addDiscountToCart(String, Cart)}
  */
 public class Exercise5 {
     private final static Logger LOG = LoggerFactory.getLogger(Exercise5.class);

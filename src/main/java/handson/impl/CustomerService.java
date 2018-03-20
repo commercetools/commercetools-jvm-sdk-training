@@ -48,7 +48,7 @@ public class CustomerService extends AbstractService {
      * @return the email verification completion stage
      */
     public CompletionStage<Customer> verifyEmail(final CustomerToken customerToken) {
-        // TODO 2.4 Verify the customer token
+        // TODO 2.3 Verify the customer token
         return null;
     }
 }
