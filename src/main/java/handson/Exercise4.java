@@ -27,6 +27,7 @@ import static handson.impl.ClientService.createSphereClient;
  *  TODO 4.1 {@link ProductQueryService#findCategory(Locale, String)}
  *  TODO 4.2 {@link ProductQueryService#withCategory(Category)}
  *  TODO 4.3 {@link ProductQueryService#findProductsWithCategory(Locale, String)}
+ *  TODO 4.4 {@link CartService#addProductToCart(ProductProjection, Cart)}
  */
 public class Exercise4 {
     private final static Logger LOG = LoggerFactory.getLogger(Exercise4.class);

@@ -23,7 +23,6 @@ import static handson.impl.ClientService.createSphereClient;
  *
  * See:
  *  TODO 3.1 {@link CartService#createCart(Customer)}
- *  TODO 3.2 {@link CartService#addProductToCart(ProductProjection, Cart)}
  */
 public class Exercise3 {
     private final static Logger LOG = LoggerFactory.getLogger(Exercise3.class);
