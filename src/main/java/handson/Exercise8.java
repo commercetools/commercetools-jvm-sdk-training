@@ -36,6 +36,7 @@ public class Exercise8 {
                     productSearchService.facetSearch("color", "red")
                             .toCompletableFuture();
             foundProducts = facetSearchResult.get();
+            LOG.info("Returned facets:", foundProducts.getFacetsResults());
             LOG.info("Found products: {}", foundProducts.getTotal());
         }
     }
