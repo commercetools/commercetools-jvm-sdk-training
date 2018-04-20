@@ -36,8 +36,13 @@ public class Exercise8 {
 
             LOG.info("Found products: {}", foundProducts.getTotal());
 
-            // TODO 8.3 Call facets search with attribute name: "color" and attribue value: "red"
-            //     on the "filters-and-facets" project
+            final CompletableFuture<PagedSearchResult<ProductProjection>> facetSearchResult =
+                    productSearchService.facetSearch("color", "red")
+                            .toCompletableFuture();
+
+            foundProducts = facetSearchResult.get();
+            LOG.info("Returned facets:", foundProducts.getFacetsResults());
+            LOG.info("Found products: {}", foundProducts.getTotal());
         }
     }
 }
