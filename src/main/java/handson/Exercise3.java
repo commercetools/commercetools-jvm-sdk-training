@@ -41,7 +41,7 @@ public class Exercise3 {
 
             final Cart cart = cartCreationResult.get();
 
-            // TODO 3.2 Get updated cart after adding product to cart
+            // TODO Get updated cart
             final CompletableFuture<Cart> addToCartResult = null;
 
             LOG.info("Created cart with product {}", cart);
