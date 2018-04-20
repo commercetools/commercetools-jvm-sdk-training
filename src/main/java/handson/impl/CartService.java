@@ -37,7 +37,7 @@ public class CartService extends AbstractService {
      * @return the cart update completion stage
      */
     public CompletionStage<Cart> addProductToCart(final ProductProjection product, final Cart cart) {
-        // TODO 4.4. Add line item to a cart
+        // TODO 3.2. Add line item to a cart
         return null;
     }
 

@@ -27,7 +27,6 @@ import static handson.impl.ClientService.createSphereClient;
  *  TODO 4.1 {@link ProductQueryService#findCategory(Locale, String)}
  *  TODO 4.2 {@link ProductQueryService#withCategory(Category)}
  *  TODO 4.3 {@link ProductQueryService#findProductsWithCategory(Locale, String)}
- *  TODO 4.4 {@link CartService#addProductToCart(ProductProjection, Cart)}
  */
 public class Exercise4 {
     private final static Logger LOG = LoggerFactory.getLogger(Exercise4.class);
@@ -53,7 +52,7 @@ public class Exercise4 {
             final PagedQueryResult<ProductProjection> productProjectionPagedQueryResult = productsOnSaleResult.get();
             final ProductProjection productProjection = productProjectionPagedQueryResult.getResults().get(0);
 
-            // TODO 4.4 Get updated cart after adding product to cart
+            // TODO from 3.2 Get updated cart after adding product to cart
             final CompletableFuture<Cart> addToCartResult = null;
 
             final Cart updatedCart = addToCartResult.get();

@@ -23,6 +23,7 @@ import static handson.impl.ClientService.createSphereClient;
  *
  * See:
  *  TODO 3.1 {@link CartService#createCart(Customer)}
+ *  TODO 3.2 {@link CartService#addProductToCart(ProductProjection, Cart)}
  */
 public class Exercise3 {
     private final static Logger LOG = LoggerFactory.getLogger(Exercise3.class);
@@ -40,7 +41,10 @@ public class Exercise3 {
 
             final Cart cart = cartCreationResult.get();
 
-            LOG.info("Created cart {}", cart);
+            // TODO 3.2 Get updated cart after adding product to cart
+            final CompletableFuture<Cart> addToCartResult = null;
+
+            LOG.info("Created cart with product {}", cart);
         }
     }
 }
