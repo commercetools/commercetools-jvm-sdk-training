@@ -28,9 +28,11 @@ public class FiltersAndFacetsExample {
 
     private static void createFacets(final SphereClient client) throws InterruptedException, ExecutionException {
         LOG.info("Exercise 1: Create Facets\n");
+
         PagedSearchResult<ProductProjection> searchResult = client.execute(ProductProjectionSearch.ofCurrent()
                 .plusFacets(m -> m.allVariants().attribute().ofString("color").allTerms())
-                .plusFacets(m -> m.allVariants().attribute().ofString("material").allTerms()).withLimit(0L))
+                .plusFacets(m -> m.allVariants().attribute().ofString("material").allTerms())
+                .withLimit(0L))
                 .toCompletableFuture().get();
         LOG.info("Facets:");
         TermFacetResult colorFacetResult = (TermFacetResult) searchResult.getFacetResult("variants.attributes.color");
@@ -44,10 +46,12 @@ public class FiltersAndFacetsExample {
 
     private static void filterProductResults(final SphereClient client) throws InterruptedException, ExecutionException {
         LOG.info("Exercise 2: Filter Product Results\n");
+
         PagedSearchResult<ProductProjection> searchResult = client.execute(ProductProjectionSearch.ofCurrent()
                 .withQueryFilters(m -> m.allVariants().attribute().ofString("color").is("red"))
                 .plusFacets(m -> m.allVariants().attribute().ofString("color").allTerms())
-                .plusFacets(m -> m.allVariants().attribute().ofString("material").allTerms()))
+                .plusFacets(m -> m.allVariants().attribute().ofString("material").allTerms())
+                .withMarkingMatchingVariants(true))
                 .toCompletableFuture().get();
 
         LOG.info("Found results: {}", searchResult.getTotal());
@@ -59,10 +63,13 @@ public class FiltersAndFacetsExample {
         TermFacetResult materialFacetResult = (TermFacetResult) searchResult.getFacetResult("variants.attributes.material");
         LOG.info("  # of material: {}", materialFacetResult.getTotal());
         LOG.info("  Terms of material: {}", materialFacetResult.getTerms());
+
+        LOG.info("Results: {}", searchResult.getResults());
     }
 
     private static void filterFacets(final SphereClient client) throws InterruptedException, ExecutionException {
         LOG.info("Exercise 3: Filter Facets\n");
+
         PagedSearchResult<ProductProjection> searchResult = client.execute(ProductProjectionSearch.ofCurrent()
                 .withQueryFilters(m -> m.allVariants().attribute().ofString("color").is("red"))
                 .plusFacets(m -> m.allVariants().attribute().ofString("material").allTerms())
