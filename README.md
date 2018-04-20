@@ -3,28 +3,28 @@ This branch includes tasks to learn the basics of commercetools JVM SDK.
 
 ## Learning Goals
 
-- Understand the tasks of Sphere clients.
-- Configure and use a sphere client correctly.
-- Understand key concepts of the CT platform like objects and object drafts.
-- Use different API endpoints to create, query, update, or delete objects.
-- Try out different fields to fulfill the tasks.
-- Create objects with a complex data structure.
-- Understand optimistic concurrency control while updating objects.
-- Understand dependencies between common objects like products and carts.
+-	Know the basics of our  JVM SDK.
+-	Understand the key concepts of the CTP, e.g. modularity and OCC.
+-	Implement own solutions to given exercises.
+-	Be able to relate the knowledge to real project issues.
+-	Be able to select an appropriate solution
+-	Be able to develop own solutions and work-arounds for specific project issues.
+
 
 ## Contents
 
-The branch includes a simple CRUD application of following tasks:
+In this exercise, we are going to perform a simple checkout, in which we will go step by step through these tasks:
 
-- Start a sphere client.
-- Query/Create a product type.
-- Create a product.
-- Update a product: set a tax category.
-- Create a cart.
-- Add a product to the cart.
-- Set a shipping address to the cart.
-- Create order from cart.
-- Cleanup project: delete created objects.
+-	Configure and create a Sphere client.
+-	Create a customer.
+-	Create a cart.
+-	Query product projections that belong to one category.
+-	Add a discount code to the created cart.
+-	Create an order from the cart.
+-	Change the state of the order.
+-	Perform a product projection search.
+-	Create and delete a subscription.
+
 
 ## How to Use
 
