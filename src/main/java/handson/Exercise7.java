@@ -29,7 +29,7 @@ import static handson.impl.ClientService.createSphereClient;
  *  TODO 7.1 {@link OrderService#changeState(Order, OrderState)}
  */
 public class Exercise7 {
-    private final static Logger LOG = LoggerFactory.getLogger(Exercise7.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Exercise7.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {

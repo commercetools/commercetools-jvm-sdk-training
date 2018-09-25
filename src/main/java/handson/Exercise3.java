@@ -1,7 +1,6 @@
 package handson;
 
 import handson.impl.CartService;
-import handson.impl.ClientService;
 import handson.impl.CustomerService;
 import io.sphere.sdk.carts.Cart;
 import io.sphere.sdk.client.SphereClient;
@@ -26,7 +25,7 @@ import static handson.impl.ClientService.createSphereClient;
  *  TODO 3.2 {@link CartService#addProductToCart(ProductProjection, Cart)}
  */
 public class Exercise3 {
-    private final static Logger LOG = LoggerFactory.getLogger(Exercise3.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Exercise3.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {

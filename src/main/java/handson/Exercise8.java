@@ -23,7 +23,7 @@ import static handson.impl.ClientService.createSphereClient;
  *  TODO 8.2 {@link ProductSearchService#facetSearch(String, String)}
  */
 public class Exercise8 {
-    private final static Logger LOG = LoggerFactory.getLogger(Exercise8.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Exercise8.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {

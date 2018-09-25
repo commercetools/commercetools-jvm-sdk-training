@@ -1,6 +1,5 @@
 package handson;
 
-import handson.impl.ClientService;
 import handson.impl.CustomerService;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.customers.Customer;
@@ -26,7 +25,7 @@ import static handson.impl.ClientService.createSphereClient;
  *  TODO 2.3 {@link CustomerService#verifyEmail(CustomerToken)}
  */
 public class Exercise2 {
-    private final static Logger LOG = LoggerFactory.getLogger(Exercise2.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Exercise2.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {
