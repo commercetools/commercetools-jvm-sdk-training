@@ -37,11 +37,14 @@ public class Exercise5 {
 
             final Cart cart = cartCreationResult.get();
 
-            final CompletableFuture<Cart> discountedCartResult = cartService.addDiscountToCart("TESTCODE", cart).toCompletableFuture();
+            LOG.info("Created cart {}", cart);
+
+            final CompletableFuture<Cart> discountedCartResult = cartService.addDiscountToCart("TESTCODE", cart)
+                                                                            .toCompletableFuture();
 
             final Cart updatedCart = discountedCartResult.get();
 
-            LOG.info("Created cart with discount {}", updatedCart);
+            LOG.info("Updated cart with a discount {}", updatedCart);
         }
     }
 }
