@@ -39,9 +39,10 @@ public class Exercise6 {
 
             final String email = String.format("%s@example.com", UUID.randomUUID().toString());
 
-            final CompletableFuture<Cart> cartCreationResult = customerService.createCustomer(email, "password")
-                    .thenComposeAsync(customerSignInResult -> cartService.createCart(customerSignInResult.getCustomer()))
-                    .toCompletableFuture();
+            final CompletableFuture<Cart> cartCreationResult = customerService
+                .createCustomer(email, "password")
+                .thenComposeAsync(customerSignInResult -> cartService.createCart(customerSignInResult.getCustomer()))
+                .toCompletableFuture();
 
             final Cart cart = cartCreationResult.get();
 
@@ -52,11 +53,13 @@ public class Exercise6 {
             final PagedQueryResult<ProductProjection> productProjectionPagedQueryResult = productsOnSaleResult.get();
             final ProductProjection productProjection = productProjectionPagedQueryResult.getResults().get(0);
 
-            final CompletableFuture<Cart> addToCartResult = cartService.addProductToCart(productProjection, cart).toCompletableFuture();
+            final CompletableFuture<Cart> addToCartResult = cartService.addProductToCart(productProjection, cart)
+                                                                       .toCompletableFuture();
 
             final Cart updatedCart = addToCartResult.get();
 
-            final CompletableFuture<Order> orderCreationResult = orderService.createOrder(updatedCart).toCompletableFuture();
+            final CompletableFuture<Order> orderCreationResult = orderService.createOrder(updatedCart)
+                                                                             .toCompletableFuture();
             final Order order = orderCreationResult.get();
 
             LOG.info("Created order {}", order);

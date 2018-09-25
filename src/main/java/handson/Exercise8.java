@@ -38,7 +38,7 @@ public class Exercise8 {
 
             final CompletableFuture<PagedSearchResult<ProductProjection>> facetSearchResult =
                     productSearchService.facetSearch("color", "red")
-                            .toCompletableFuture();
+                                        .toCompletableFuture();
 
             foundProducts = facetSearchResult.get();
             LOG.info("Returned facets:", foundProducts.getFacetsResults());
