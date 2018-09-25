@@ -6,6 +6,7 @@ import io.sphere.sdk.carts.Cart;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.customers.Customer;
 import io.sphere.sdk.products.ProductProjection;
+import io.sphere.sdk.products.queries.ProductProjectionByKeyGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,10 +41,18 @@ public class Exercise3 {
 
             final Cart cart = cartCreationResult.get();
 
-            // TODO Get updated cart
-            final CompletableFuture<Cart> addToCartResult = null;
+            LOG.info("Created cart {}", cart);
 
-            LOG.info("Created cart with product {}", cart);
+            final ProductProjection productProjection = client.execute(ProductProjectionByKeyGet.ofCurrent("123"))
+                                                              .toCompletableFuture()
+                                                              .join();
+
+
+            final CompletableFuture<Cart> addToCartResult = cartService.addProductToCart(productProjection, cart)
+                                                                       .toCompletableFuture();
+
+            final Cart cartAfterUpdate = addToCartResult.get();
+            LOG.info("Updated cart with product {}", cartAfterUpdate);
         }
     }
 }
