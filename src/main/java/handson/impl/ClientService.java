@@ -31,9 +31,6 @@ public class ClientService {
         final Properties prop = new Properties();
         prop.load(ClientService.class.getResourceAsStream("/dev.properties"));
 
-        final String apiUrl = prop.getProperty("apiUrl");
-        final String authUrl = prop.getProperty("authUrl");
-
         //TODO 1.2 Create the configuration for the sphere client
         return null;
     }
