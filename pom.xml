@@ -47,7 +47,6 @@
             <artifactId>commercetools-convenience</artifactId>
             <version>${ctp.sdk.version}</version>
         </dependency>
-
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -64,6 +63,11 @@
             <artifactId>assertj-core</artifactId>
             <version>3.2.0</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.commercetools</groupId>
+            <artifactId>commercetools-sync-java</artifactId>
+            <version>v1.0.0-M13</version>
         </dependency>
     </dependencies>
 </project>
