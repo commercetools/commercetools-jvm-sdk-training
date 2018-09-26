@@ -18,10 +18,11 @@ public class ClientService {
     public static SphereClient createSphereClient() throws IOException {
         final SphereClientConfig clientConfig = loadCTPClientConfig();
 
-        //TODO 1.1.3. Create the client
-        final HttpClient httpClient = SphereAsyncHttpClientFactory.create();
-        final SphereAccessTokenSupplier tokenSupplier = SphereAccessTokenSupplier.ofAutoRefresh(clientConfig, httpClient, true);
-        return SphereClient.of(clientConfig, httpClient, tokenSupplier);
+        final HttpClient httpClient = new SphereAsyncHttpClientFactory().getClient();
+        final SphereAccessTokenSupplier sphereAccessTokenSupplier = SphereAccessTokenSupplier
+            .ofAutoRefresh(clientConfig, httpClient, true);
+
+        return SphereClient.of(clientConfig, httpClient, sphereAccessTokenSupplier);
     }
 
     /**
@@ -32,12 +33,6 @@ public class ClientService {
     private static SphereClientConfig loadCTPClientConfig() throws IOException {
         final Properties prop = new Properties();
         prop.load(ClientService.class.getResourceAsStream("/dev.properties"));
-
-        final String apiUrl = prop.getProperty("apiUrl");
-        final String authUrl = prop.getProperty("authUrl");
-        //TODO 1.1.2. Create the configuration for the sphere client
-        return SphereClientConfig.ofProperties(prop, "")
-                .withApiUrl(apiUrl)
-                .withAuthUrl(authUrl);
+        return SphereClientConfig.ofProperties(prop, "");
     }
 }

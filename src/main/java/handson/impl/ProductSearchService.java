@@ -25,7 +25,8 @@ public class ProductSearchService extends AbstractService {
      * @return the full-text search completion stage
      */
     public CompletionStage<PagedSearchResult<ProductProjection>> fulltextSearch(final LocalizedStringEntry searchText) {
-        return client.execute(ProductProjectionSearch.ofCurrent().withText(searchText));
+        return client.execute(ProductProjectionSearch.ofCurrent()
+                                                     .withText(searchText));
     }
 
     /**
@@ -36,8 +37,9 @@ public class ProductSearchService extends AbstractService {
      * @return the term facet search completion stage
      */
     public CompletionStage<PagedSearchResult<ProductProjection>> facetSearch(final String attributeName, String attributeValue) {
-        return client.execute(ProductProjectionSearch.ofCurrent()
-                .plusFacets(facetSearchModel -> facetSearchModel.allVariants().attribute().ofString(attributeName).allTerms())
-                .plusQueryFilters(productModel -> productModel.allVariants().attribute().ofString(attributeName).is(attributeValue)));
+        return client.execute(ProductProjectionSearch
+            .ofCurrent()
+            .plusFacets(facetSearchModel -> facetSearchModel.allVariants().attribute().ofString(attributeName).allTerms())
+            .plusQueryFilters(productModel -> productModel.allVariants().attribute().ofString(attributeName).is(attributeValue)));
     }
 }

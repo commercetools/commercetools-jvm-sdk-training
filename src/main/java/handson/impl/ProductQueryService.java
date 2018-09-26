@@ -6,10 +6,10 @@ import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.products.ProductProjection;
 import io.sphere.sdk.products.queries.ProductProjectionQuery;
 import io.sphere.sdk.queries.PagedQueryResult;
+import io.sphere.sdk.queries.PagedResult;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import static java.util.Collections.singletonList;
@@ -32,7 +32,10 @@ public class ProductQueryService extends AbstractService {
      */
     public CompletionStage<PagedQueryResult<ProductProjection>> findProductsWithCategory(final Locale locale, final String name) {
         return findCategory(locale, name)
-            .thenComposeAsync(categoryPagedQueryResult -> withCategory(categoryPagedQueryResult.getResults().get(0)));
+            .thenApplyAsync(PagedResult::head)
+            .thenComposeAsync(categoryOptional ->
+                categoryOptional.map(this::withCategory)
+                                .orElseGet(() -> CompletableFuture.completedFuture(PagedQueryResult.empty())));
     }
 
     private CompletionStage<PagedQueryResult<Category>> findCategory(final Locale locale, final String name) {
@@ -40,7 +43,9 @@ public class ProductQueryService extends AbstractService {
     }
 
     private CompletionStage<PagedQueryResult<ProductProjection>> withCategory(final Category category) {
-        return client.execute(ProductProjectionQuery.ofStaged()
-                                                    .withPredicates(m -> m.categories().isIn(singletonList(category))));
+        final ProductProjectionQuery query = ProductProjectionQuery.ofStaged()
+                                                                   .withPredicates(m -> m.categories().isIn(singletonList(category)));
+
+        return client.execute(query);
     }
 }
