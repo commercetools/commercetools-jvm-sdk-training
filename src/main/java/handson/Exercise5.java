@@ -19,7 +19,7 @@ import static handson.impl.ClientService.createSphereClient;
  * Create a cart for a customer and add a discount to it.
  */
 public class Exercise5 {
-    private final static Logger LOG = LoggerFactory.getLogger(Exercise5.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Exercise5.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {
@@ -34,11 +34,14 @@ public class Exercise5 {
 
             final Cart cart = cartCreationResult.get();
 
-            final CompletableFuture<Cart> discountedCartResult = cartService.addDiscountToCart("", cart).toCompletableFuture();
+            LOG.info("Created cart {}", cart);
+
+            final CompletableFuture<Cart> discountedCartResult = cartService.addDiscountToCart("TESTCODE", cart)
+                                                                            .toCompletableFuture();
 
             final Cart updatedCart = discountedCartResult.get();
 
-            LOG.info("Created cart with discount {}", updatedCart);
+            LOG.info("Updated cart with a discount {}", updatedCart);
         }
     }
 }

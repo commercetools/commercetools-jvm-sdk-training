@@ -15,3 +15,9 @@ hs_err_pid*
 *.iml
 target
 src/main/resources/dev.properties
+
+# various IDEs
+.setttings
+.classpath
+.project
+org.eclipse.*

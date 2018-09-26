@@ -25,7 +25,7 @@ import static handson.impl.ClientService.createSphereClient;
  * Create a cart for a customer, add a product to it, create an order from the cart and change the order state.
  */
 public class Exercise9 {
-    private final static Logger LOG = LoggerFactory.getLogger(Exercise9.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Exercise9.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {
@@ -36,8 +36,8 @@ public class Exercise9 {
             final SubscriptionService subscriptionService = new SubscriptionService(client, "eu-west-1", "https://sqs.eu-west-1.amazonaws.com/501843469210/tut_mko");
 
             final CompletableFuture<Subscription> subscriptionCreationResult =
-                    subscriptionService.createSqsSubscriptin()
-                            .toCompletableFuture();
+                    subscriptionService.createSqsSubscription()
+                                       .toCompletableFuture();
             final Subscription subscription = subscriptionCreationResult.get();
 
             final String email = String.format("%s@example.com", UUID.randomUUID().toString());
@@ -67,7 +67,7 @@ public class Exercise9 {
             final CompletableFuture<Order> orderChangeResult = orderService.changeState(order, OrderState.CANCELLED).toCompletableFuture();
             final Order updatedOrder = orderChangeResult.get();
 
-            final CompletableFuture<Subscription> subscriptionCompletableFuture = subscriptionService.deleteSqsSubscriptin(subscription)
+            final CompletableFuture<Subscription> subscriptionCompletableFuture = subscriptionService.deleteSqsSubscription(subscription)
                     .toCompletableFuture();
             final Subscription updatedSubscription = subscriptionCompletableFuture.get();
 

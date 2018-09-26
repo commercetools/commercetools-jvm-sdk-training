@@ -4,6 +4,8 @@ import handson.impl.CartService;
 import handson.impl.CustomerService;
 import io.sphere.sdk.carts.Cart;
 import io.sphere.sdk.client.SphereClient;
+import io.sphere.sdk.products.ProductProjection;
+import io.sphere.sdk.products.queries.ProductProjectionByKeyGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +21,7 @@ import static handson.impl.ClientService.createSphereClient;
  * Create a cart for a customer.
  */
 public class Exercise3 {
-    private final static Logger LOG = LoggerFactory.getLogger(Exercise3.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Exercise3.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {
@@ -35,6 +37,17 @@ public class Exercise3 {
             final Cart cart = cartCreationResult.get();
 
             LOG.info("Created cart {}", cart);
+
+            final ProductProjection productProjection = client.execute(ProductProjectionByKeyGet.ofCurrent("123"))
+                                                              .toCompletableFuture()
+                                                              .join();
+
+
+            final CompletableFuture<Cart> addToCartResult = cartService.addProductToCart(productProjection, cart)
+                                                                       .toCompletableFuture();
+
+            final Cart cartAfterUpdate = addToCartResult.get();
+            LOG.info("Updated cart with product {}", cartAfterUpdate);
         }
     }
 }

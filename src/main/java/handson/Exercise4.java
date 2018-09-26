@@ -23,7 +23,7 @@ import static handson.impl.ClientService.createSphereClient;
  * Create a cart for a customer and add a product to it.
  */
 public class Exercise4 {
-    private final static Logger LOG = LoggerFactory.getLogger(Exercise4.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Exercise4.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {
@@ -46,7 +46,10 @@ public class Exercise4 {
             final PagedQueryResult<ProductProjection> productProjectionPagedQueryResult = productsOnSaleResult.get();
             final ProductProjection productProjection = productProjectionPagedQueryResult.getResults().get(0);
 
-            final CompletableFuture<Cart> addToCartResult = cartService.addProductToCart(productProjection, cart).toCompletableFuture();
+            LOG.info("Found product under category 'sale' {}", productProjection);
+
+            final CompletableFuture<Cart> addToCartResult = cartService.addProductToCart(productProjection, cart)
+                                                                       .toCompletableFuture();
 
             final Cart updatedCart = addToCartResult.get();
 

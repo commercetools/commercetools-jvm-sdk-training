@@ -19,7 +19,7 @@ import static handson.impl.ClientService.createSphereClient;
  * Full text search and term facets search for products.
  */
 public class Exercise8 {
-    private final static Logger LOG = LoggerFactory.getLogger(Exercise8.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Exercise8.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {
@@ -34,9 +34,10 @@ public class Exercise8 {
 
             final CompletableFuture<PagedSearchResult<ProductProjection>> facetSearchResult =
                     productSearchService.facetSearch("color", "red")
-                            .toCompletableFuture();
+                                        .toCompletableFuture();
+
             foundProducts = facetSearchResult.get();
-            LOG.info("Returned facets:", foundProducts.getFacetsResults());
+            LOG.info("Returned facets: {}", foundProducts.getFacetsResults());
             LOG.info("Found products: {}", foundProducts.getTotal());
         }
     }

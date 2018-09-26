@@ -3,6 +3,7 @@ package handson;
 import handson.impl.CustomerService;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.customers.Customer;
+import io.sphere.sdk.customers.CustomerSignInResult;
 import io.sphere.sdk.customers.CustomerToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
 import static handson.impl.ClientService.createSphereClient;
@@ -19,7 +21,7 @@ import static handson.impl.ClientService.createSphereClient;
  * Registers a new customer.
  */
 public class Exercise2 {
-    private final static Logger LOG = LoggerFactory.getLogger(Exercise2.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Exercise2.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {
@@ -27,9 +29,12 @@ public class Exercise2 {
 
             final String email = String.format("%s@example.com", UUID.randomUUID().toString());
 
-            final CompletableFuture<CustomerToken> customerTokenResult = customerService.createCustomer(email, "password").thenComposeAsync(
-                    customerSignInResult -> customerService.createEmailVerificationToken(customerSignInResult.getCustomer(), 5))
-                    .toCompletableFuture();
+            final CompletionStage<CustomerSignInResult> customerCreationResult = customerService.createCustomer(email, "password");
+
+            final CompletableFuture<CustomerToken> customerTokenResult = customerCreationResult
+                .thenComposeAsync(customerSignInResult ->
+                    customerService.createEmailVerificationToken(customerSignInResult.getCustomer(), 5))
+                .toCompletableFuture();
             final CustomerToken customerToken = customerTokenResult.get();
 
             final CompletableFuture<Customer> verifyEmailResult = customerService.verifyEmail(customerToken)

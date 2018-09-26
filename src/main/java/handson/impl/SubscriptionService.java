@@ -5,6 +5,8 @@ import io.sphere.sdk.orders.Order;
 import io.sphere.sdk.subscriptions.*;
 import io.sphere.sdk.subscriptions.commands.SubscriptionCreateCommand;
 import io.sphere.sdk.subscriptions.commands.SubscriptionDeleteCommand;
+import io.sphere.sdk.subscriptions.ChangeSubscription;
+import io.sphere.sdk.subscriptions.Subscription;
 
 import java.net.URI;
 import java.util.Collections;
@@ -21,7 +23,7 @@ public class SubscriptionService extends AbstractService {
         this.queueUrl = URI.create(queueUrl);
     }
 
-    public CompletionStage<Subscription> createSqsSubscriptin() {
+    public CompletionStage<Subscription> createSqsSubscription() {
         final AwsCredentials awsCredentials = AwsCredentials.ofAwsCliEnv();
         final SubscriptionDraftDsl subscriptionDraft = SubscriptionDraftBuilder.of(SqsDestination.of(awsCredentials, region, queueUrl))
                 .changes(createOrderChanges())
@@ -34,7 +36,7 @@ public class SubscriptionService extends AbstractService {
         return Collections.singletonList(ChangeSubscription.of(Order.resourceTypeId()));
     }
 
-    public CompletionStage<Subscription> deleteSqsSubscriptin(final Subscription subscription) {
+    public CompletionStage<Subscription> deleteSqsSubscription(final Subscription subscription) {
         return client.execute(SubscriptionDeleteCommand.of(subscription));
     }
 }

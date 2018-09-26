@@ -16,7 +16,7 @@ import static handson.impl.ClientService.createSphereClient;
  * Configure sphere client and get project information.
  */
 public class Exercise1 {
-    private final static Logger LOG = LoggerFactory.getLogger(Exercise1.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Exercise1.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {

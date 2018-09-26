@@ -8,8 +8,11 @@ import io.sphere.sdk.products.queries.ProductProjectionQuery;
 import io.sphere.sdk.queries.PagedQueryResult;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.concurrent.CompletionStage;
+
+import static java.util.Collections.singletonList;
 
 /**
  * This class provides query operations for {@link ProductProjection}s.
@@ -28,8 +31,8 @@ public class ProductQueryService extends AbstractService {
      * @return the product query completion stage
      */
     public CompletionStage<PagedQueryResult<ProductProjection>> findProductsWithCategory(final Locale locale, final String name) {
-        return findCategory(locale, name).thenComposeAsync(
-                categoryPagedQueryResult -> withCategory(categoryPagedQueryResult.getResults().get(0)));
+        return findCategory(locale, name)
+            .thenComposeAsync(categoryPagedQueryResult -> withCategory(categoryPagedQueryResult.getResults().get(0)));
     }
 
     private CompletionStage<PagedQueryResult<Category>> findCategory(final Locale locale, final String name) {
@@ -37,6 +40,7 @@ public class ProductQueryService extends AbstractService {
     }
 
     private CompletionStage<PagedQueryResult<ProductProjection>> withCategory(final Category category) {
-        return client.execute(ProductProjectionQuery.ofStaged().withPredicates(m -> m.categories().isIn(Arrays.asList(category))));
+        return client.execute(ProductProjectionQuery.ofStaged()
+                                                    .withPredicates(m -> m.categories().isIn(singletonList(category))));
     }
 }
