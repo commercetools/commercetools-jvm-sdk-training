@@ -26,7 +26,7 @@ import static handson.impl.ClientService.createSphereClient;
  *
  * See:
  *  TODO 9.1 {@link SubscriptionService#createSqsSubscription()}
- *  TODO 9.2 {@link SubscriptionService#deleteSqsSubscriptin(Subscription)}
+ *  TODO 9.2 {@link SubscriptionService#deleteSqsSubscription(Subscription)}
  */
 public class Exercise9 {
     private static final Logger LOG = LoggerFactory.getLogger(Exercise9.class);
@@ -41,7 +41,7 @@ public class Exercise9 {
 
             final CompletableFuture<Subscription> subscriptionCreationResult =
                     subscriptionService.createSqsSubscription()
-                            .toCompletableFuture();
+                                       .toCompletableFuture();
             final Subscription subscription = subscriptionCreationResult.get();
 
             final String email = String.format("%s@example.com", UUID.randomUUID().toString());
@@ -71,7 +71,7 @@ public class Exercise9 {
             final CompletableFuture<Order> orderChangeResult = orderService.changeState(order, OrderState.CANCELLED).toCompletableFuture();
             final Order updatedOrder = orderChangeResult.get();
 
-            final CompletableFuture<Subscription> subscriptionCompletableFuture = subscriptionService.deleteSqsSubscriptin(subscription)
+            final CompletableFuture<Subscription> subscriptionCompletableFuture = subscriptionService.deleteSqsSubscription(subscription)
                     .toCompletableFuture();
             final Subscription updatedSubscription = subscriptionCompletableFuture.get();
 

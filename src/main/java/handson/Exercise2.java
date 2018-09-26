@@ -35,9 +35,10 @@ public class Exercise2 {
 
             final CompletionStage<CustomerSignInResult> customerCreationResult = customerService.createCustomer(email, "password");
 
-            final CompletableFuture<CustomerToken> customerTokenResult =
-                    customerCreationResult.thenComposeAsync(customerSignInResult -> customerService.createEmailVerificationToken(customerSignInResult.getCustomer(), 5))
-                            .toCompletableFuture();
+            final CompletableFuture<CustomerToken> customerTokenResult = customerCreationResult
+                .thenComposeAsync(customerSignInResult ->
+                    customerService.createEmailVerificationToken(customerSignInResult.getCustomer(), 5))
+                .toCompletableFuture();
             final CustomerToken customerToken = customerTokenResult.get();
 
             final CompletableFuture<Customer> verifyEmailResult = customerService.verifyEmail(customerToken)

@@ -55,9 +55,8 @@ public class Exercise4 {
             LOG.info("Found product under category 'sale' {}", productProjection);
 
             // Get updated cart after adding product to cart in task 3.2.
-            final CompletableFuture<Cart> addToCartResult =
-                    cartService.addProductToCart(productProjection, cart)
-                            .toCompletableFuture();
+            final CompletableFuture<Cart> addToCartResult = cartService.addProductToCart(productProjection, cart)
+                                                                       .toCompletableFuture();
 
             final Cart updatedCart = addToCartResult.get();
 

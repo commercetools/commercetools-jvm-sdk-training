@@ -33,7 +33,7 @@ public class SubscriptionService extends AbstractService {
         return Collections.singletonList(ChangeSubscription.of(Order.resourceTypeId()));
     }
 
-    public CompletionStage<Subscription> deleteSqsSubscriptin(final Subscription subscription) {
+    public CompletionStage<Subscription> deleteSqsSubscription(final Subscription subscription) {
         // TODO 9.2 Delete given subscription
         return null;
     }
