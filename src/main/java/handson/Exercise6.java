@@ -46,8 +46,6 @@ public class Exercise6 {
             final CompletableFuture<PagedQueryResult<ProductProjection>> productsOnSaleResult =
                     productQueryService.findProductsWithCategory(Locale.ENGLISH, "Sale")
                             .toCompletableFuture();
-                productQueryService.findProductsWithCategory(Locale.ENGLISH, "Sale")
-                                   .toCompletableFuture();
 
             final PagedQueryResult<ProductProjection> productProjectionPagedQueryResult = productsOnSaleResult.get();
             final ProductProjection productProjection = productProjectionPagedQueryResult.getResults().get(0);
