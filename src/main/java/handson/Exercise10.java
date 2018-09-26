@@ -1,11 +1,19 @@
 package handson;
+
+import com.commercetools.sync.products.ProductSync;
+import com.commercetools.sync.products.ProductSyncOptions;
+import com.commercetools.sync.products.ProductSyncOptionsBuilder;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.products.Image;
 import io.sphere.sdk.products.ImageDimensions;
 import io.sphere.sdk.products.PriceDraftBuilder;
 import io.sphere.sdk.products.PriceDraftDsl;
 import io.sphere.sdk.products.ProductDraft;
+import io.sphere.sdk.products.ProductDraftBuilder;
 import io.sphere.sdk.products.ProductDraftDsl;
+import io.sphere.sdk.products.ProductVariantDraftBuilder;
+import io.sphere.sdk.products.ProductVariantDraftDsl;
+import io.sphere.sdk.producttypes.ProductType;
 import io.sphere.sdk.utils.HighPrecisionMoneyImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static handson.impl.ClientService.createSphereClient;
+import static io.sphere.sdk.models.LocalizedString.ofEnglish;
 
 //TODO 10.1 Please replace "yourName" in products.csv with your name.
 public class Exercise10 {
@@ -37,6 +46,17 @@ public class Exercise10 {
         try (final SphereClient client = createSphereClient()) {
 
             //TODO 10.3 Sync the product drafts
+
+            final ProductSyncOptions productSyncOptions = ProductSyncOptionsBuilder.of(client)
+                                                                                   .errorCallback(LOG::error)
+                                                                                   .warningCallback(LOG::warn)
+                                                                                   .build();
+
+            final ProductSync productSync = new ProductSync(productSyncOptions);
+            productSync.sync(productDrafts)
+                       .thenAcceptAsync(productSyncStatistics -> LOG.info(productSyncStatistics.getReportMessage()))
+                       .toCompletableFuture()
+                       .get();
         }
     }
 
@@ -75,9 +95,19 @@ public class Exercise10 {
         final Image image = Image.of(imageUrl, ImageDimensions.of(100, 100));
 
         //TODO 10.1 Create a ProductVariantDraft
+        final ProductVariantDraftDsl variantDraftDsl = ProductVariantDraftBuilder.of()
+                                                                                 .sku(sku)
+                                                                                 .key(variantKey)
+                                                                                 .prices(priceDraftDsl)
+                                                                                 .images(image)
+                                                                                 .build();
 
         //TODO 10.2 Create a ProductDraft and return it.
-
-        return null;
+        return ProductDraftBuilder
+            .of(ProductType.referenceOfId(productTypeKey), ofEnglish(productName), ofEnglish(sku),
+                variantDraftDsl)
+            .key(productKey)
+            .description(ofEnglish(productDescription))
+            .build();
     }
 }
