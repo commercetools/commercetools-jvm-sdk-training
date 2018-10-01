@@ -3,11 +3,15 @@ package handson.impl;
 import io.sphere.sdk.carts.Cart;
 import io.sphere.sdk.carts.commands.CartUpdateCommand;
 import io.sphere.sdk.carts.commands.updateactions.AddLineItem;
+import io.sphere.sdk.carts.commands.updateactions.SetShippingAddress;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.customers.Customer;
+import io.sphere.sdk.models.AddressBuilder;
 import io.sphere.sdk.products.ProductProjection;
 
 import java.util.concurrent.CompletionStage;
+
+import com.neovisionaries.i18n.CountryCode;
 
 /**
  * This class provides operations to work with {@link Cart}s.
@@ -52,4 +56,16 @@ public class CartService extends AbstractService {
         // TODO 5.1 Add discount code to cart
         return null;
     }
+    
+	/**
+	 * Add shipping address to the cart
+	 * 
+	 * @param cart
+	 *            the cart
+	 * @return completion state that sets the shipping address
+	 */
+	public CompletionStage<Cart> addShippingAddress(final Cart cart) {
+		return client
+				.execute(CartUpdateCommand.of(cart, SetShippingAddress.of(AddressBuilder.of(CountryCode.DE).build())));
+	}
 }

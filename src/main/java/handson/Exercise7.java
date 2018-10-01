@@ -54,7 +54,8 @@ public class Exercise7 {
             final ProductProjection productProjection = productProjectionPagedQueryResult.getResults().get(0);
 
             final CompletableFuture<Cart> addToCartResult = cartService.addProductToCart(productProjection, cart)
-                                                                       .toCompletableFuture();
+																	   .thenComposeAsync(c -> cartService.addShippingAddress(c))
+												                       .toCompletableFuture();
 
             final Cart updatedCart = addToCartResult.get();
 
