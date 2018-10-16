@@ -57,7 +57,7 @@ public class OrderServiceTest extends BaseTest {
                 .toCompletableFuture();
 
         final Order order = orderCompletionResult.get();
-        assertThat(order.getState()).isEqualTo(OrderState.COMPLETE);
+        assertThat(order.getOrderState()).isEqualTo(OrderState.COMPLETE);
     }
 
 }
