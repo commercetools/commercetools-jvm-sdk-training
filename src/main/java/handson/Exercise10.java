@@ -72,7 +72,7 @@ public class Exercise10 {
 
 
         final PriceDraftDsl priceDraftDsl = PriceDraftBuilder
-            .of(HighPrecisionMoneyImpl.of(BigDecimal.valueOf(basePrice), currencyCode, 3))
+            .of(MoneyImpl.of(BigDecimal.valueOf(basePrice), currencyCode))
             .build();
 
         final Image image = Image.of(imageUrl, ImageDimensions.of(100, 100));
