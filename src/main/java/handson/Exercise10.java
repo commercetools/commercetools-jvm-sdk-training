@@ -37,7 +37,7 @@ public class Exercise10 {
         LOG.info("Starting Sync..");
         try (final SphereClient client = createSphereClient()) {
 
-            //TODO 10.3 Sync the product drafts
+            //TODO 10.4 Sync the product drafts
         }
     }
 
@@ -77,9 +77,9 @@ public class Exercise10 {
 
         final Image image = Image.of(imageUrl, ImageDimensions.of(100, 100));
 
-        //TODO 10.1 Create a ProductVariantDraft
+        //TODO 10.2 Create a ProductVariantDraft.
 
-        //TODO 10.2 Create a ProductDraft and return it.
+        //TODO 10.3 Create a ProductDraft and return it.
 
         return null;
     }
