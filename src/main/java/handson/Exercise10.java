@@ -21,8 +21,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static handson.impl.ClientService.createSphereClient;
+import static java.lang.String.format;
 
-//TODO 10.1 Please replace "yourName" in products.csv with your name.
+
 public class Exercise10 {
     private static final Logger LOG = LoggerFactory.getLogger(Exercise10.class);
 
@@ -57,10 +58,12 @@ public class Exercise10 {
 
     private static ProductDraftDsl processLine(@Nonnull final String line) {
         final String[] splitLine = line.split(",");
+        //TODO 10.1 Please replace the prefix below (with value "yourName") with your actual name.
+        final String prefix = "yourName";
         final String productTypeKey = splitLine[0];
-        final String productKey = splitLine[1];
-        final String sku = splitLine[2];
-        final String variantKey = splitLine[3];
+        final String productKey = format("%s-%s", prefix, splitLine[1]);
+        final String sku = format("%s-%s", prefix, splitLine[2]);
+        final String variantKey = format("%s-%s", prefix, splitLine[3]);
         final String productName = splitLine[4];
         final String productDescription = splitLine[5];
         final double basePrice = Double.parseDouble(splitLine[6]);
