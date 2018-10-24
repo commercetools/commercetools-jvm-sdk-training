@@ -60,7 +60,7 @@ public class Exercise10 {
         final String productKey = format("%s-%s", prefix, splitLine[1]);
         final String sku = format("%s-%s", prefix, splitLine[2]);
         final String variantKey = format("%s-%s", prefix, splitLine[3]);
-        final String productName = splitLine[4];
+        final String productName = format("%s-%s", prefix, splitLine[4]);
         final String productDescription = splitLine[5];
         final double basePrice = Double.parseDouble(splitLine[6]);
         final String currencyCode = splitLine[7];
