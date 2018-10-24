@@ -6,16 +6,16 @@ import io.sphere.sdk.products.PriceDraftBuilder;
 import io.sphere.sdk.products.PriceDraftDsl;
 import io.sphere.sdk.products.ProductDraft;
 import io.sphere.sdk.products.ProductDraftDsl;
-import io.sphere.sdk.utils.HighPrecisionMoneyImpl;
+import io.sphere.sdk.utils.MoneyImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -42,17 +42,13 @@ public class Exercise10 {
     }
 
     private static List<ProductDraft> processInputFile(@Nonnull final String inputFilePath) {
-        List<ProductDraft> inputList = new ArrayList<>();
-        try(final BufferedReader br = new BufferedReader(new InputStreamReader(Exercise10.class.getResourceAsStream(inputFilePath)))) {
-            // skip the header of the csv
-            inputList = br.lines()
-                          .skip(1)
-                          .map(Exercise10::processLine)
-                          .collect(Collectors.toList());
-        } catch (IOException e) {
-            LOG.error("error streaming file", e);
-        }
-        return inputList;
+        final InputStream csvAsStream = Exercise10.class.getResourceAsStream(inputFilePath);
+        final BufferedReader br = new BufferedReader(new InputStreamReader(csvAsStream));
+
+        return br.lines()
+                 .skip(1) // skip the header of the csv
+                 .map(Exercise10::processLine)
+                 .collect(Collectors.toList());
     }
 
 
