@@ -1,3 +1,3 @@
 productType,productId,inventoryId,articleId,productName,productDescription,basePrice,currencyCode,imageUrl
-example-product-type,yourName-P1,yourName-SKU101,yourName-A101,Shirt,You will look good in this,1123.350,EUR,https://s3-eu-west-1.amazonaws.com/commercetools-maximilian/products/081455_1_medium.jpg
-example-product-type,yourName-P2,yourName-SKU102,yourName-A102,Shirt,You will look good in this,1000.000,EUR,https://s3-eu-west-1.amazonaws.com/commercetools-maximilian/products/081455_1_medium.jpg
+example-product-type,P1,SKU101,A101,Shirt,You will look good in this,1123,EUR,https://s3-eu-west-1.amazonaws.com/commercetools-maximilian/products/081455_1_medium.jpg
+example-product-type,P2,SKU102,A102,Shirt,You will look good in this,1000,EUR,https://s3-eu-west-1.amazonaws.com/commercetools-maximilian/products/081455_1_medium.jpg
