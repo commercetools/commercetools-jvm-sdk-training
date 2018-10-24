@@ -73,7 +73,7 @@ public class Exercise10 {
     private static ProductDraftDsl processLine(@Nonnull final String line) {
         final String[] splitLine = line.split(",");
         //TODO 10.1 Please replace the prefix below (with value "yourName") with your actual name.
-        final String prefix = "Hesham";
+        final String prefix = "John";
         final String productTypeKey = splitLine[0];
         final String productKey = format("%s-%s", prefix, splitLine[1]);
         final String sku = format("%s-%s", prefix, splitLine[2]);
