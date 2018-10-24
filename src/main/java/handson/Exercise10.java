@@ -14,24 +14,24 @@ import io.sphere.sdk.products.ProductDraftDsl;
 import io.sphere.sdk.products.ProductVariantDraftBuilder;
 import io.sphere.sdk.products.ProductVariantDraftDsl;
 import io.sphere.sdk.producttypes.ProductType;
-import io.sphere.sdk.utils.HighPrecisionMoneyImpl;
+import io.sphere.sdk.utils.MoneyImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static handson.impl.ClientService.createSphereClient;
 import static io.sphere.sdk.models.LocalizedString.ofEnglish;
+import static java.lang.String.format;
 
-//TODO 10.1 Please replace "yourName" in products.csv with your name.
 public class Exercise10 {
     private static final Logger LOG = LoggerFactory.getLogger(Exercise10.class);
 
@@ -45,8 +45,7 @@ public class Exercise10 {
         LOG.info("Starting Sync..");
         try (final SphereClient client = createSphereClient()) {
 
-            //TODO 10.3 Sync the product drafts
-
+            //TODO 10.4 Sync the product drafts
             final ProductSyncOptions productSyncOptions = ProductSyncOptionsBuilder.of(client)
                                                                                    .errorCallback(LOG::error)
                                                                                    .warningCallback(LOG::warn)
@@ -61,27 +60,25 @@ public class Exercise10 {
     }
 
     private static List<ProductDraft> processInputFile(@Nonnull final String inputFilePath) {
-        List<ProductDraft> inputList = new ArrayList<>();
-        try(final BufferedReader br = new BufferedReader(new InputStreamReader(Exercise10.class.getResourceAsStream(inputFilePath)))) {
-            // skip the header of the csv
-            inputList = br.lines()
-                          .skip(1)
-                          .map(Exercise10::processLine)
-                          .collect(Collectors.toList());
-        } catch (IOException e) {
-            LOG.error("error streaming file", e);
-        }
-        return inputList;
+        final InputStream csvAsStream = Exercise10.class.getResourceAsStream(inputFilePath);
+        final BufferedReader br = new BufferedReader(new InputStreamReader(csvAsStream));
+
+        return br.lines()
+                 .skip(1) // skip the header of the csv
+                 .map(Exercise10::processLine)
+                 .collect(Collectors.toList());
     }
 
 
     private static ProductDraftDsl processLine(@Nonnull final String line) {
         final String[] splitLine = line.split(",");
+        //TODO 10.1 Please replace the prefix below (with value "yourName") with your actual name.
+        final String prefix = "Hesham";
         final String productTypeKey = splitLine[0];
-        final String productKey = splitLine[1];
-        final String sku = splitLine[2];
-        final String variantKey = splitLine[3];
-        final String productName = splitLine[4];
+        final String productKey = format("%s-%s", prefix, splitLine[1]);
+        final String sku = format("%s-%s", prefix, splitLine[2]);
+        final String variantKey = format("%s-%s", prefix, splitLine[3]);
+        final String productName = format("%s-%s", prefix, splitLine[4]);
         final String productDescription = splitLine[5];
         final double basePrice = Double.parseDouble(splitLine[6]);
         final String currencyCode = splitLine[7];
@@ -89,12 +86,12 @@ public class Exercise10 {
 
 
         final PriceDraftDsl priceDraftDsl = PriceDraftBuilder
-            .of(HighPrecisionMoneyImpl.of(BigDecimal.valueOf(basePrice), currencyCode, 3))
+            .of(MoneyImpl.of(BigDecimal.valueOf(basePrice), currencyCode))
             .build();
 
         final Image image = Image.of(imageUrl, ImageDimensions.of(100, 100));
 
-        //TODO 10.1 Create a ProductVariantDraft
+        //TODO 10.2 Create a ProductVariantDraft
         final ProductVariantDraftDsl variantDraftDsl = ProductVariantDraftBuilder.of()
                                                                                  .sku(sku)
                                                                                  .key(variantKey)
@@ -102,7 +99,7 @@ public class Exercise10 {
                                                                                  .images(image)
                                                                                  .build();
 
-        //TODO 10.2 Create a ProductDraft and return it.
+        //TODO 10.3 Create a ProductDraft and return it.
         return ProductDraftBuilder
             .of(ProductType.referenceOfId(productTypeKey), ofEnglish(productName), ofEnglish(sku),
                 variantDraftDsl)
