@@ -1,32 +1,27 @@
-# sphere-jvm-sdk-hands-on
-This branch includes tasks to learn the basics of commercetools JVM SDK.
+# commercetools Java Training Exercises
 
-## Learning Goals
+This repo contains exercises for the [commercetools JVM SDK](https://github.com/commercetools/commercetools-jvm-sdk) training. 
+These exercises complement the training program, and are not intended to deliver a full understanding of commercetools by themselves.
 
--	Know the basics of our  JVM SDK.
--	Understand the key concepts of the CTP, e.g. modularity and OCC.
--	Implement own solutions to given exercises.
--	Be able to relate the knowledge to real project issues.
--	Be able to select an appropriate solution
--	Be able to develop own solutions and work-arounds for specific project issues.
+If you are interested in attending a training, please [contact us directly](https://ok.commercetools.com/training-offering)!
 
+------
 
-## Contents
+These exercises are intended to run on your local machine. 
 
-In this exercise, we are going to perform a simple checkout, in which we will go step by step through these tasks:
+Training participants should finish following exercises:
+- Configure and create client
+- Get project info
+- Query all product types
+- Query all tax categories
+- Create a product
+- Query products
+- Search products
+- Create a customer
+- Create a cart
+- Query a cart by id
+- Update cart
+- Create an order from cart
+- Delete cart
 
--	Configure and create a Sphere client.
--	Create a customer.
--	Create a cart.
--	Query product projections that belong to one category.
--	Add a discount code to the created cart.
--	Create an order from the cart.
--	Change the state of the order.
--	Perform a product projection search.
--	Create and delete a subscription.
-
-
-## How to Use
-
-After checking out this branch, check the TODOs in the handson folder.
-You can show the tasks in Intellij with the shortcut CMD+6, in Eclipse (Window > Show view > Tasks).
+Typically, the `MOODLE*.java` scripts will not be modified. Tasks require implementing the modules in `impl/` until the `MOODLE*.java` scripts show the intended behavior. 
