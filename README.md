@@ -1,21 +1,32 @@
 # sphere-jvm-sdk-hands-on
-Java project to play with the Commercetools JVM SDK
+This branch includes tasks to learn the basics of commercetools JVM SDK.
 
-## Units
+## Learning Goals
 
-1. [SphereClient and SphereRequest](src/test/java/architecture/README.md)
-1. CRUD
-    1. [create](src/test/java/crud/lecture1_create/README.md)
-    1. [get by identifier](src/test/java/crud/lecture2_get/README.md)
-    1. [query](src/test/java/crud/lecture3_query/README.md)
-    1. [update](src/test/java/crud/lecture4_update/README.md)
-    1. [delete](src/test/java/crud/lecture5_delete/README.md)
-1. [Common Types](src/test/java/commontypes/README.md)
+-	Know the basics of our  JVM SDK.
+-	Understand the key concepts of the CTP, e.g. modularity and OCC.
+-	Implement own solutions to given exercises.
+-	Be able to relate the knowledge to real project issues.
+-	Be able to select an appropriate solution
+-	Be able to develop own solutions and work-arounds for specific project issues.
 
-## Links
 
-* Developer documentation HTTP API: http://dev.commercetools.com/
-* JVM SDK: https://github.com/commercetools/commercetools-jvm-sdk
-* Hands on: https://github.com/commercetools/commercetools-jvm-sdk-hands-on
-* Merchant Center: https://admin.sphere.io/
-* Playground/impex: https://impex.sphere.io/playground
+## Contents
+
+In this exercise, we are going to perform a simple checkout, in which we will go step by step through these tasks:
+
+-	Configure and create a Sphere client.
+-	Create a customer.
+-	Create a cart.
+-	Query product projections that belong to one category.
+-	Add a discount code to the created cart.
+-	Create an order from the cart.
+-	Change the state of the order.
+-	Perform a product projection search.
+-	Create and delete a subscription.
+
+
+## How to Use
+
+After checking out this branch, check the TODOs in the handson folder.
+You can show the tasks in Intellij with the shortcut CMD+6, in Eclipse (Window > Show view > Tasks).
