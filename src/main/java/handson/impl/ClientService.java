@@ -16,9 +16,9 @@ public class ClientService {
      * @throws IOException
      */
     public static SphereClient createSphereClient() throws IOException {
+
         final SphereClientConfig clientConfig = loadCTPClientConfig();
 
-        //TODO 1.3 Create the client
         return null;
     }
 
@@ -28,10 +28,9 @@ public class ClientService {
      * @throws IOException
      */
     private static SphereClientConfig loadCTPClientConfig() throws IOException {
-        final Properties prop = new Properties();
-        prop.load(ClientService.class.getResourceAsStream("/dev.properties"));
 
-        //TODO 1.2 Create the configuration for the sphere client
         return null;
+
+
     }
 }

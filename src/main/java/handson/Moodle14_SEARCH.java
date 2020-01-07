@@ -1,6 +1,8 @@
 package handson;
 
+import handson.impl.ProductSearchService;
 import io.sphere.sdk.client.SphereClient;
+import io.sphere.sdk.models.LocalizedStringEntry;
 import io.sphere.sdk.products.ProductProjection;
 import io.sphere.sdk.products.search.ProductProjectionSearch;
 import io.sphere.sdk.search.PagedSearchResult;
@@ -13,19 +15,46 @@ import java.util.concurrent.ExecutionException;
 
 import static handson.impl.ClientService.createSphereClient;
 
-public class FiltersAndFacetsExample {
-    private final static Logger LOG = LoggerFactory.getLogger(FiltersAndFacetsExample.class);
+
+/**
+ * Full text search and term facets search for products.
+ *
+ * See:
+ *  TODO Task08.1 {@link ProductSearchService#fulltextSearch(LocalizedStringEntry)}
+ *  TODO Task08.2 {@link ProductSearchService#facetSearch(String, String)}
+ */
+public class Moodle14_SEARCH {
+    private static final Logger LOG = LoggerFactory.getLogger(Moodle14_SEARCH.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         try (final SphereClient client = createSphereClient()) {
-            createFacets(client);
+            final ProductSearchService productSearchService = new ProductSearchService(client);
 
-            filterProductResults(client);
 
-            filterFacets(client);
+            // TODO: Search products using the ProductProjections API
+            //
+            PagedSearchResult<ProductProjection> foundProducts =
+                    productSearchService.fulltextSearch(LocalizedStringEntry.of("en", "Red-wine"))
+                            .toCompletableFuture().get();
+            LOG.info("Found products: {}", foundProducts.getTotal());
+
+
+            // TODO: Search products and facets using the ProductProjectionsSearch API
+            //
+            foundProducts =
+                    productSearchService.facetSearch("deepness", "super deep")
+                                        .toCompletableFuture().get();
+            LOG.info("Returned facets: {}", foundProducts.getFacetsResults());
+            LOG.info("Found products: {}", foundProducts.getTotal());
+
+
         }
     }
 
+
+
+    // Additional material for inspection after class
+    //
     private static void createFacets(final SphereClient client) throws InterruptedException, ExecutionException {
         LOG.info("Exercise 1: Create Facets\n");
 
@@ -45,6 +74,7 @@ public class FiltersAndFacetsExample {
     }
 
     private static void filterProductResults(final SphereClient client) throws InterruptedException, ExecutionException {
+
         LOG.info("Exercise 2: Filter Product Results\n");
 
         PagedSearchResult<ProductProjection> searchResult = client.execute(ProductProjectionSearch.ofCurrent()
@@ -83,4 +113,5 @@ public class FiltersAndFacetsExample {
         LOG.info("  # of material: {}", materialFacetResult.getTotal());
         LOG.info("  Terms of material: {}", materialFacetResult.getTerms());
     }
+
 }

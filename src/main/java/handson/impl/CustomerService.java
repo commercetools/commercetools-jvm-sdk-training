@@ -1,10 +1,14 @@
 package handson.impl;
 
+import com.neovisionaries.i18n.CountryCode;
 import io.sphere.sdk.client.SphereClient;
-import io.sphere.sdk.customers.Customer;
-import io.sphere.sdk.customers.CustomerSignInResult;
-import io.sphere.sdk.customers.CustomerToken;
+import io.sphere.sdk.customers.*;
+import io.sphere.sdk.customers.commands.CustomerCreateCommand;
+import io.sphere.sdk.customers.commands.CustomerCreateEmailTokenCommand;
+import io.sphere.sdk.customers.commands.CustomerVerifyEmailCommand;
+import io.sphere.sdk.models.Address;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletionStage;
 
 /**
@@ -24,8 +28,31 @@ public class CustomerService extends AbstractService {
      * @return the customer creation completion stage
      */
     public CompletionStage<CustomerSignInResult> createCustomer(final String email, final String password) {
-        // TODO 2.1 Create a customer
-        return null;
+
+        final CustomerDraft customerDraft;
+
+        return
+                null;
+    }
+
+    /**
+     * Creates a new customer {@link Customer} with the given parameters.
+     *
+     * @param email    the customers email
+     * @param password the customers password
+     * @return the customer creation completion stage
+     */
+    public CompletionStage<CustomerSignInResult> createCustomer(final String email,
+                                                                final String password,
+                                                                final String key,
+                                                                final String firstName,
+                                                                final String lastName,
+                                                                final CountryCode countryCode) {
+
+        final CustomerDraft customerDraft;
+
+        return
+                null;
     }
 
     /**
@@ -37,8 +64,9 @@ public class CustomerService extends AbstractService {
      * @return the customer token creation completion stage
      */
     public CompletionStage<CustomerToken> createEmailVerificationToken(final Customer customer, final Integer timeToLiveInMinutes) {
-        // TODO 2.2 Create an email verification token
-        return null;
+
+        return
+                null;
     }
 
     /**
@@ -48,7 +76,8 @@ public class CustomerService extends AbstractService {
      * @return the email verification completion stage
      */
     public CompletionStage<Customer> verifyEmail(final CustomerToken customerToken) {
-        // TODO 2.3 Verify the customer token
-        return null;
+
+        return
+                null;
     }
 }

@@ -1,11 +1,11 @@
 package handson;
+import com.commercetools.sync.products.ProductSync;
+import com.commercetools.sync.products.ProductSyncOptions;
+import com.commercetools.sync.products.ProductSyncOptionsBuilder;
 import io.sphere.sdk.client.SphereClient;
-import io.sphere.sdk.products.Image;
-import io.sphere.sdk.products.ImageDimensions;
-import io.sphere.sdk.products.PriceDraftBuilder;
-import io.sphere.sdk.products.PriceDraftDsl;
-import io.sphere.sdk.products.ProductDraft;
-import io.sphere.sdk.products.ProductDraftDsl;
+import io.sphere.sdk.models.LocalizedString;
+import io.sphere.sdk.products.*;
+import io.sphere.sdk.producttypes.ProductType;
 import io.sphere.sdk.utils.MoneyImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +24,8 @@ import static handson.impl.ClientService.createSphereClient;
 import static java.lang.String.format;
 
 
-public class Exercise10 {
-    private static final Logger LOG = LoggerFactory.getLogger(Exercise10.class);
+public class Moodle10_PRODUCTSYNC {
+    private static final Logger LOG = LoggerFactory.getLogger(Moodle10_PRODUCTSYNC.class);
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
 
@@ -37,25 +37,28 @@ public class Exercise10 {
         LOG.info("Starting Sync..");
         try (final SphereClient client = createSphereClient()) {
 
-            //TODO 10.4 Sync the product drafts
+            //TODO Sync the product drafts
+
+
         }
     }
 
     private static List<ProductDraft> processInputFile(@Nonnull final String inputFilePath) {
-        final InputStream csvAsStream = Exercise10.class.getResourceAsStream(inputFilePath);
+        final InputStream csvAsStream = Moodle10_PRODUCTSYNC.class.getResourceAsStream(inputFilePath);
         final BufferedReader br = new BufferedReader(new InputStreamReader(csvAsStream));
 
         return br.lines()
                  .skip(1) // skip the header of the csv
-                 .map(Exercise10::processLine)
+                 .map(Moodle10_PRODUCTSYNC::processLine)
                  .collect(Collectors.toList());
     }
 
 
-    private static ProductDraftDsl processLine(@Nonnull final String line) {
+    private static ProductDraft processLine(@Nonnull final String line) {
         final String[] splitLine = line.split(",");
-        //TODO 10.1 Please replace the prefix below (with value "yourName") with your actual name.
-        final String prefix = "yourName";
+
+        //TODO Please replace the prefix below (with value "yourName") with your actual name.
+        final String prefix = "MH";
         final String productTypeKey = splitLine[0];
         final String productKey = format("%s-%s", prefix, splitLine[1]);
         final String sku = format("%s-%s", prefix, splitLine[2]);
@@ -67,16 +70,20 @@ public class Exercise10 {
         final String imageUrl = splitLine[8];
 
 
-        final PriceDraftDsl priceDraftDsl = PriceDraftBuilder
+        final PriceDraft priceDraft = PriceDraftBuilder
             .of(MoneyImpl.of(BigDecimal.valueOf(basePrice), currencyCode))
             .build();
 
         final Image image = Image.of(imageUrl, ImageDimensions.of(100, 100));
 
-        //TODO 10.2 Create a ProductVariantDraft.
+        //TODO Create a ProductVariantDraft.
 
-        //TODO 10.3 Create a ProductDraft and return it.
+        final ProductVariantDraft productVariantDraft = null;
 
-        return null;
+        //TODO Create a ProductDraft and return it.
+
+        final ProductDraft productDraft = null;
+
+        return productDraft;
     }
 }

@@ -4,13 +4,16 @@ import io.sphere.sdk.carts.Cart;
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.orders.Order;
 import io.sphere.sdk.orders.OrderState;
+import io.sphere.sdk.orders.commands.OrderFromCartCreateCommand;
+import io.sphere.sdk.orders.commands.OrderUpdateCommand;
+import io.sphere.sdk.orders.commands.updateactions.ChangeOrderState;
 
 import java.util.concurrent.CompletionStage;
 
 /**
  * This class provides operations to work with {@link Order}s.
  */
-public class OrderService extends AbstractService {
+public class    OrderService extends AbstractService {
 
     public OrderService(SphereClient client) {
         super(client);
@@ -23,8 +26,9 @@ public class OrderService extends AbstractService {
      * @return the order creation completion stage
      */
     public CompletionStage<Order> createOrder(final Cart cart) {
-        // TODO 6.1 Create a new order from cart
-        return null;
+
+        return
+                null;
     }
 
     /**
@@ -35,7 +39,8 @@ public class OrderService extends AbstractService {
      * @return the order state change completion stage
      */
     public CompletionStage<Order> changeState(final Order order, final OrderState state) {
-        // TODO 7.1 Change the state of an order
-        return null;
+
+        return
+                null;
     }
 }

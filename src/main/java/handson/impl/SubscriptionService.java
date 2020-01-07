@@ -2,8 +2,9 @@ package handson.impl;
 
 import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.orders.Order;
-import io.sphere.sdk.subscriptions.ChangeSubscription;
-import io.sphere.sdk.subscriptions.Subscription;
+import io.sphere.sdk.subscriptions.*;
+import io.sphere.sdk.subscriptions.commands.SubscriptionCreateCommand;
+import io.sphere.sdk.subscriptions.commands.SubscriptionDeleteCommand;
 
 import java.net.URI;
 import java.util.Collections;
@@ -24,17 +25,19 @@ public class SubscriptionService extends AbstractService {
     }
 
     public CompletionStage<Subscription> createSqsSubscription() {
-        // TODO 9.1 Create sqs subscription for sqs queue
-        // HINT: use the createOrderchanges helper method
-        return null;
+
+        return
+                null;
     }
 
     private List<ChangeSubscription> createOrderChanges() {
-        return Collections.singletonList(ChangeSubscription.of(Order.resourceTypeId()));
+        return
+                null;
     }
 
     public CompletionStage<Subscription> deleteSqsSubscription(final Subscription subscription) {
-        // TODO 9.2 Delete given subscription
-        return null;
+
+        return
+                null;
     }
 }
