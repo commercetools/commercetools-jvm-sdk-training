@@ -24,6 +24,15 @@ public class ClientService {
         return SphereClient.of(clientConfig, httpClient, sphereAccessTokenSupplier);
     }
 
+    public static SphereClient createSphereClientWithConstantToken(final String token) throws IOException {
+
+        final SphereClientConfig clientConfig = loadCTPClientConfig();
+        final HttpClient httpClient = new SphereAsyncHttpClientFactory().getClient();
+        final SphereAccessTokenSupplier sphereAccessTokenSupplier =
+                SphereAccessTokenSupplier.ofConstantToken(token);
+        return SphereClient.of(clientConfig, httpClient, sphereAccessTokenSupplier);
+    }
+    
     /**
      * Sets a sphere client configuration
      * @return sphere client configuration
