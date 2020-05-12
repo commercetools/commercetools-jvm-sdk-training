@@ -57,8 +57,8 @@ public class Moodle10_PRODUCTSYNC {
     private static ProductDraft processLine(@Nonnull final String line) {
         final String[] splitLine = line.split(",");
 
-        //TODO Please replace the prefix below (with value "yourName") with your actual name.
-        final String prefix = "MH";
+        //TODO Please replace the prefix below (with value "yourInitials") with your actual initials.
+        final String prefix = "yourInitials";
         final String productTypeKey = splitLine[0];
         final String productKey = format("%s-%s", prefix, splitLine[1]);
         final String sku = format("%s-%s", prefix, splitLine[2]);
