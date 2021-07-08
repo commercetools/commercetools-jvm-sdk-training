@@ -1,0 +1,19 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <option name="LINE_SEPARATOR" value="&#10;" />
+    <JSON>
+      <option name="ARRAY_WRAPPING" value="5" />
+    </JSON>
+    <codeStyleSettings language="JAVA">
+      <option name="KEEP_LINE_BREAKS" value="false" />
+      <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+      <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+    </codeStyleSettings>
+    <codeStyleSettings language="JSON">
+      <option name="KEEP_LINE_BREAKS" value="false" />
+      <indentOptions>
+        <option name="TAB_SIZE" value="2" />
+      </indentOptions>
+    </codeStyleSettings>
+  </code_scheme>
+</component>
